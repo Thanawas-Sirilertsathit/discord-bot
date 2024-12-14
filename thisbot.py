@@ -4,6 +4,7 @@ import random
 import json
 from decouple import config
 from collections import Counter
+from datetime import timedelta, datetime
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -41,23 +42,42 @@ def get_or_create_chips(player_id, default=1000):
     """Initialize chips 1000."""
     data = load_player_data()
     if str(player_id) not in data:
-        data[str(player_id)] = default
+        data[str(player_id)] = {'chips': default, 'last_claim': None}
         save_player_data(data)
     return data[str(player_id)]
+
+def update_last_claim(player_id):
+    """Update the last claim time to the current time."""
+    data = load_player_data()
+    data[str(player_id)]['last_claim'] = datetime.now().isoformat()
+    save_player_data(data)
 
 def update_player_chips(player_id, chips):
     """Update chips value for a player."""
     data = load_player_data()
-    data[str(player_id)] = chips
+    data[str(player_id)]["chips"] = chips
     save_player_data(data)
     print("Success updated")
 
+def can_claim_daily_reward(player_id):
+    """Check if the player can claim the daily reward."""
+    data = load_player_data()
+    last_claim = data.get(str(player_id), {}).get('last_claim')
+    
+    if not last_claim:
+        return True
+    
+    last_claim_time = datetime.fromisoformat(last_claim)
+    now = datetime.now()
+    if now - last_claim_time >= timedelta(days=1):
+        return True
+    return False
 
 class PokerGame:
     """Pokergame class."""
     def __init__(self, players):
         """Initialize game."""
-        self.players = {player: {'hand': [], 'chips': get_or_create_chips(player.id), 'bet': 0, 'folded': False} for player in players}
+        self.players = {player: {'hand': [], 'chips': get_or_create_chips(player.id)["chips"], 'bet': 0, 'folded': False} for player in players}
         self.pot = 0
         self.table_cards = []
         self.current_bet = 0
@@ -224,6 +244,38 @@ async def poker(ctx, *players: discord.Member):
     # Display everyone's chip counts
     results = "\n".join([f"{player.mention}: {game.players[player]['chips']} chips" for player in players])
     await ctx.send(f"Final chip counts:\n{results}")
+
+
+@bot.command()
+async def daily(ctx):
+    """Claim daily 1000 chips."""
+    player_id = ctx.author.id
+    data = load_player_data()
+    
+    if can_claim_daily_reward(player_id):
+        current_chips = data[str(player_id)]['chips']
+        new_chips = current_chips + 1000
+        update_player_chips(player_id, new_chips)
+        update_last_claim(player_id)
+        await ctx.send(f"{ctx.author.mention}, you've claimed your daily reward of 1000 chips! You now have {new_chips} chips.")
+    else:
+        next_claim_time = datetime.fromisoformat(data[str(player_id)]['last_claim']) + timedelta(days=1)
+        await ctx.send(f"{ctx.author.mention}, you can claim your next daily reward at {next_claim_time.strftime('%Y-%m-%d %H:%M:%S')}.")
+
+
+@bot.command()
+async def balance(ctx, user: discord.Member = None):
+    """Check your current chip balance."""
+    if user is None:
+        user = ctx.author
+
+    data = load_player_data()
+    if str(user.id) in data:
+        current_chips = data[str(user.id)]['chips']
+        await ctx.send(f"{user.mention}, your current balance is {current_chips} chips.")
+    else:
+        await ctx.send(f"{user.mention}, you don't have any chips yet.")
+
 
 @bot.event
 async def on_ready():
