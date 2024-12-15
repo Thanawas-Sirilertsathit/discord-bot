@@ -4,7 +4,7 @@ from thisbot import evaluate_hand
 def test_straight():
     """Test when card form a straight."""
     hand = ['[ 5 ♦ ]', '[ 6 ♣ ]', '[ 7 ♠ ]', '[ 8 ♥ ]', '[ 9 ♠ ]']
-    table_cards = []
+    table_cards = ['[ A ♠ ]']
     
     score, best_hand = evaluate_hand(hand, table_cards)
     
@@ -20,7 +20,7 @@ def test_straight():
     assert score == 5, "Test failed! Expected Straight (score 5)."
 
     hand = ['[ A ♦ ]', '[ 10 ♣ ]', '[ J ♠ ]', '[ Q ♥ ]', '[ K ♠ ]']
-    table_cards = []
+    table_cards = ['[ Q ♠ ]']
     
     score, best_hand = evaluate_hand(hand, table_cards)
     
