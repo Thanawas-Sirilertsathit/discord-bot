@@ -22,7 +22,7 @@ def create_deck():
     """Create a card deck."""
     suits = ['♥️', '♦️', '♣️', '♠️']
     ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-    return [f"{rank} of {suit}" for suit in suits for rank in ranks]
+    return [f"[ {rank} {suit} ]" for suit in suits for rank in ranks]
 
 def load_player_data():
     """Read player data."""
@@ -36,7 +36,6 @@ def save_player_data(data):
     """Write json file."""
     with open(DATA_FILE, "w") as file:
         json.dump(data, file, indent=4)
-        print("Success saved")
 
 def get_or_create_chips(player_id, default=1000):
     """Initialize chips 1000."""
@@ -57,7 +56,6 @@ def update_player_chips(player_id, chips):
     data = load_player_data()
     data[str(player_id)]["chips"] = chips
     save_player_data(data)
-    print("Success updated")
 
 def can_claim_daily_reward(player_id):
     """Check if the player can claim the daily reward."""
@@ -125,9 +123,39 @@ class PokerGame:
                 scores[player] = (score, best_hand)
 
         max_score = max(scores.values(), key=lambda x: x[0])[0]
-        winners = [player for player, (score, _) in scores.items() if score == max_score]
+        potential_winners = {player: high_cards for player, (score, high_cards) in scores.items() if score == max_score}
+
+        # Tie-breaking by high cards
+        ranks = '2 3 4 5 6 7 8 9 10 J Q K A'.split()
+        suits = ['♥️', '♦️', '♣️', '♠️']
+        rank_values = {rank: i for i, rank in enumerate(ranks, start=2)}
+        if len(potential_winners) > 1:
+            sorted_winners = sorted(
+                potential_winners.items(),
+                key=lambda item: [rank_values[rank] for rank in item[1]],
+                reverse=True
+            )
+            max_high_cards = sorted_winners[0][1]
+            winners = [player for player, high_cards in sorted_winners if high_cards == max_high_cards]
+        else:
+            winners = list(potential_winners.keys())
+
         winner_cards = {winner: self.players[winner]['hand'] + self.table_cards for winner in winners}
         return winners, max_score, scores, winner_cards
+
+    def collect_initial_chips(self, amount=10):
+        """Collect initial chips from all players to the pot."""
+        for player in self.players:
+            if self.players[player]['chips'] >= amount:
+                self.players[player]['chips'] -= amount
+                self.players[player]['bet'] += amount
+                self.pot += amount
+                update_player_chips(player.id, self.players[player]['chips'])
+                self.current_bet =  amount
+            else:
+                # Automatically Fold
+                self.players[player]['folded'] = True
+                self.active_players.remove(player)
 
 
 def evaluate_hand(hand, table_cards):
@@ -136,13 +164,20 @@ def evaluate_hand(hand, table_cards):
     ranks = '2 3 4 5 6 7 8 9 10 J Q K A'.split()
     suits = ['♥️', '♦️', '♣️', '♠️']
     rank_values = {rank: i for i, rank in enumerate(ranks, start=2)}
-    cards_by_rank = Counter(card.split(' ')[0] for card in combined)
-    cards_by_suit = Counter(card.split(' ')[-1] for card in combined)
+    cards_by_rank = Counter(card.split()[1] for card in combined)
+    cards_by_suit = Counter(card.split()[2].strip() for card in combined)
     rank_count = sorted(cards_by_rank.values(), reverse=True)
     sorted_ranks = sorted(cards_by_rank, key=lambda r: (rank_values[r], cards_by_rank[r]), reverse=True)
     def is_straight(ranks_list):
-        indexes = sorted(rank_values[rank] for rank in ranks_list)
-        return all(b == a + 1 for a, b in zip(indexes, indexes[1:]))
+        indexes = sorted(set(rank_values[rank] for rank in ranks_list))
+        for i in range(len(indexes) - 4):
+            if indexes[i + 4] - indexes[i] == 4:
+                return True
+        # Check for low-Ace straight (5 4 3 2 A)
+        if {2, 3, 4, 5, 14}.issubset(set(rank_values[rank] for rank in ranks_list)):
+            return True
+        return False
+
     def is_flush():
         return any(count >= 5 for count in cards_by_suit.values())
     is_flush_hand = is_flush()
@@ -182,48 +217,72 @@ async def poker(ctx, *players: discord.Member):
     if ctx.author not in players:
         players.append(ctx.author)
 
+    if len(players) < 2:
+        await ctx.send("You need at least two players!")
+        return
+
     deck = create_deck()
     random.shuffle(deck)
 
     game = PokerGame(players)
+    game.collect_initial_chips(10)
+    await ctx.send(f"Each player has contributed 10 🪙 to the pot. The pot now contains {game.pot} 🪙.")
+
+    removed_players = [player for player in players if game.players[player]['folded']]
+    if removed_players:
+        await ctx.send(
+            f"The following players were removed from the game due to insufficient chips: "
+            f"{', '.join(player.mention for player in removed_players)}"
+        )
     game.deal_hands(deck)
     game.deal_table(deck)
 
     # Send private DMs with hands
     for player in players:
         try:
-            hand = ', '.join(game.players[player]['hand'])
+            hand = ' '.join(game.players[player]['hand'])
             await player.send(f"Your hand: {hand}")
         except discord.Forbidden:
             await ctx.send(f"Could not send a DM to {player.mention}. They need to enable DMs from server members.")
 
     # Send table cards in the channel
-    await ctx.send(f"Table cards: {', '.join(game.table_cards)}")
+    await ctx.send(f"Table cards: {' '.join(game.table_cards)}")
 
     # Betting phase
     for player in players:
         if game.players[player]['folded']:
             continue
 
-        await ctx.send(f"{player.mention}, it's your turn! Current bet: {game.current_bet}. Your chips: {game.players[player]['chips']}. Type \\*bet <amount> or \\*fold.")
+        await ctx.send(f"{player.mention}, it's your turn! Current bet: {game.current_bet} 🪙. Your chips: {game.players[player]['chips']} 🪙. Type \\*bet <amount> or \\*fold.")
 
         def check(m):
             return m.author == player and (m.content.startswith("*bet") or m.content == "*fold")
 
-        try:
-            msg = await bot.wait_for('message', check=check, timeout=60.0)
-            if msg.content.startswith("*bet"):
-                amount = int(msg.content.split()[1])
-                if game.place_bet(player, amount):
-                    await ctx.send(f"{player.mention} bets {amount} chips.")
-                else:
-                    await ctx.send(f"{player.mention}, you don't have enough chips!")
-            elif msg.content == "*fold":
+        while True:
+            try:
+                msg = await bot.wait_for('message', check=check, timeout=60.0)
+
+                if msg.content.startswith("*bet"):
+                    try:
+                        amount = int(msg.content.split()[1])
+                        if amount <= 0:
+                            await ctx.send(f"{player.mention}, you must bet a positive amount!")
+                        elif amount > game.players[player]['chips']:
+                            await ctx.send(f"{player.mention}, you don't have enough chips to bet {amount}!")
+                        else:
+                            game.place_bet(player, amount)
+                            await ctx.send(f"{player.mention} bets {amount} 🪙.")
+                            break
+                    except ValueError:
+                        await ctx.send(f"{player.mention}, please enter a valid number for the bet amount!")
+                elif msg.content == "*fold":
+                    game.fold(player)
+                    await ctx.send(f"{player.mention} folds.")
+                    break
+            except Exception:
+                await ctx.send(f"{player.mention} took too long and has been folded.")
                 game.fold(player)
-                await ctx.send(f"{player.mention} folds.")
-        except:
-            await ctx.send(f"{player.mention} took too long and has been folded.")
-            game.fold(player)
+                break
 
     # Determine winner
     winners, max_score, scores, winner_cards = game.determine_winner()
@@ -236,13 +295,13 @@ async def poker(ctx, *players: discord.Member):
 
     if len(winners) == 1:
         winner = winners[0]
-        winner_hand = ', '.join(winner_cards[winner])
-        await ctx.send(f"The winner is {winner.mention} with a {hand_rankings[max_score - 1]}!\nTheir cards: {winner_hand}")
+        winner_hand = ' '.join(winner_cards[winner])
+        await ctx.send(f"The winner is {winner.mention} with {hand_rankings[max_score - 1]}!\nTheir cards: {winner_hand}")
     else:
         await ctx.send(f"It's a tie between: {', '.join(winner.mention for winner in winners)} with a {hand_rankings[max_score - 1]}!")
 
     # Display everyone's chip counts
-    results = "\n".join([f"{player.mention}: {game.players[player]['chips']} chips" for player in players])
+    results = "\n".join([f"{player.mention}: {game.players[player]['chips']} 🪙" for player in players])
     await ctx.send(f"Final chip counts:\n{results}")
 
 
@@ -257,7 +316,7 @@ async def daily(ctx):
         new_chips = current_chips + 1000
         update_player_chips(player_id, new_chips)
         update_last_claim(player_id)
-        await ctx.send(f"{ctx.author.mention}, you've claimed your daily reward of 1000 chips! You now have {new_chips} chips.")
+        await ctx.send(f"{ctx.author.mention}, you've claimed your daily reward of 1000 🪙! You now have {new_chips} 🪙.")
     else:
         next_claim_time = datetime.fromisoformat(data[str(player_id)]['last_claim']) + timedelta(days=1)
         await ctx.send(f"{ctx.author.mention}, you can claim your next daily reward at {next_claim_time.strftime('%Y-%m-%d %H:%M:%S')}.")
@@ -272,13 +331,14 @@ async def balance(ctx, user: discord.Member = None):
     data = load_player_data()
     if str(user.id) in data:
         current_chips = data[str(user.id)]['chips']
-        await ctx.send(f"{user.mention}, your current balance is {current_chips} chips.")
+        await ctx.send(f"{user.mention}, your current balance is {current_chips} 🪙.")
     else:
-        await ctx.send(f"{user.mention}, you don't have any chips yet.")
+        await ctx.send(f"{user.mention}, you don't have any 🪙 yet.")
 
 
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
-bot.run(BOT_TOKEN)
+if __name__ == '__main__':
+    bot.run(BOT_TOKEN)
