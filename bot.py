@@ -22,7 +22,7 @@ DATA_FILE = "econ_data.json"
 
 @bot.command()
 async def poker(ctx, *players: discord.Member):
-    """Poker game for fun (to invoke command please use *poker @player1 @...)"""
+    """Poker game for fun (*poker @player1 @player2 @...)."""
     if not players:
         await ctx.send("Please mention at least one player!")
         return
@@ -179,7 +179,7 @@ async def balance(ctx, user: discord.Member = None):
 
 @bot.command()
 async def bombgame(ctx, *players: discord.Member):
-    """Start a bomb card game (*bombgame @player1 @player2 ...) the winner will get 100 🪙."""
+    """Start a bomb card game (*bombgame @player1 @player2 ...)."""
     if not players:
         await ctx.send("Please mention at least one player!")
         return
