@@ -1,5 +1,5 @@
 from datetime import datetime
-from thisbot import evaluate_hand
+from bot import evaluate_hand
 
 def test_straight():
     """Test when card form a straight."""
