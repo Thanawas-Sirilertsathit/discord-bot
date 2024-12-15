@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 from helper_functions import *
 from poker import PokerGame
 from bombgame import BombCardGame
+from discord.ext.commands import BucketType
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -271,6 +272,7 @@ async def bombgame(ctx, *players: discord.Member):
     await ctx.send(f"Final chip counts:\n{results}")
 
 @bot.command()
+@commands.cooldown(1, 10, BucketType.user)
 async def slot(ctx):
     """Play a slot machine game for 10 chips."""
     player_id = ctx.author.id
@@ -342,6 +344,19 @@ async def slot(ctx):
     else:
         await ctx.send(f"{ctx.author.mention}, better luck next time! You didn't win any chips this time.")
 
+@slot.error
+async def slot_error(ctx, error):
+    """Handle slot cooldown error"""
+    if isinstance(error, commands.CommandOnCooldown):
+        retry_after = error.retry_after
+        minutes, seconds = divmod(retry_after, 60)
+        cooldown_message = (
+            f"⏳ {ctx.author.mention}, the slot machine is cooling down! "
+            f"Please wait {int(seconds)} seconds before trying again."
+        )
+        await ctx.send(cooldown_message)
+        return
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
@@ -349,6 +364,8 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
+        pass
+    elif isinstance(error, commands.CommandOnCooldown):
         pass
     else:
         raise error
