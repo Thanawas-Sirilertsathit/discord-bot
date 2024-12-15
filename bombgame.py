@@ -18,14 +18,12 @@ class BombCardGame:
 
         self.cards = ['BOMB'] * bomb_count + ['SAFE'] * safe_count
         random.shuffle(self.cards)
-
-        # Map card positions to card values
         self.card_map = {i + 1: self.cards[i] for i in range(len(self.cards))}
 
     def pick_card(self, player, card_number):
         """Allow a player to pick a specific card."""
         if card_number not in self.card_map:
-            return None  # Invalid pick
+            return None
 
         card = self.card_map.pop(card_number)
         if card == 'BOMB':
