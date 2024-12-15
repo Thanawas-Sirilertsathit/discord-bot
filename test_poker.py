@@ -47,6 +47,14 @@ def test_straight_flush():
     # Expected result: Score 9 for Straight Flush
     print(f"Straight Flush Test - Score: {score}, Best Hand: {best_hand}")
     assert score == 9, "Test failed! Expected Straight Flush (score 9)."
+    hand = ['[ A ♦ ]', '[ 2 ♦ ]', '[ 3 ♦ ]', '[ 4 ♦ ]', '[ 5 ♦ ]']
+    table_cards = []
+    
+    score, best_hand = evaluate_hand(hand, table_cards)
+    
+    # Expected result: Score 9 for Straight Flush
+    print(f"Straight Flush Test - Score: {score}, Best Hand: {best_hand}")
+    assert score == 9, "Test failed! Expected Straight Flush (score 9)."
 
 if __name__ == '__main__':
     test_straight()

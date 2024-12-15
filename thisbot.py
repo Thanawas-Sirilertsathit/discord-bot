@@ -196,9 +196,13 @@ def evaluate_hand(hand, table_cards):
             selected_rank_values = [rank_values_dict[rank] for rank in selected_ranks]
             selected_rank_values.sort()
 
-            if all(selected_rank_values[i + 1] - selected_rank_values[i] == 1 for i in range(4)):
-                if len(set(selected_suits)) == 1:
-                    return True
+            if len(set(selected_rank_values)) == 5:
+                if all(selected_rank_values[i + 1] - selected_rank_values[i] == 1 for i in range(4)):
+                    if len(set(selected_suits)) == 1:
+                        return True
+                if {2, 3, 4, 5, 14}.issubset(set(selected_rank_values)):
+                    if len(set(selected_suits)) == 1:
+                        return True
 
         return False
 
