@@ -242,7 +242,7 @@ async def bombgame(ctx, *players: discord.Member):
         card = game.pick_card(current_player, chosen_card)
         if card == 'BOMB':
             await ctx.send(
-                f"{current_player.mention} picked card {chosen_card} and got a 💣 BOMB! They are eliminated!"
+                f"{current_player.mention} picked card {chosen_card} and got a 💣 BOMB! {current_player.mention} is eliminated!"
             )
         else:
             await ctx.send(
