@@ -5,6 +5,7 @@ from decouple import config
 from datetime import timedelta, datetime
 from helper_functions import *
 from poker import PokerGame
+from bombgame import BombCardGame
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -175,6 +176,99 @@ async def balance(ctx, user: discord.Member = None):
     else:
         await ctx.send(f"{user.mention}, you don't have any 🪙 yet.")
 
+
+@bot.command()
+async def bombgame(ctx, *players: discord.Member):
+    """Start a bomb card game (*bombgame @player1 @player2 ...) the winner will get 100 🪙."""
+    if not players:
+        await ctx.send("Please mention at least one player!")
+        return
+
+    players = list(set(players))
+    if ctx.author not in players:
+        players.append(ctx.author)
+
+    if len(players) < 2:
+        await ctx.send("You need at least two players!")
+        return
+
+    game = BombCardGame(players)
+    await ctx.send(
+        f"Starting the Bomb Card Game with {len(players)} players! Each player will take turns picking numbered cards."
+    )
+
+    turn = 0
+    while not game.check_game_end():
+        current_player = game.active_players[turn % len(game.active_players)]
+
+        def check(m):
+            return m.author == current_player
+
+        valid_choice = False
+        while not valid_choice:
+            try:
+                await ctx.send(
+                    f"{current_player.mention}, it's your turn! Available cards: {game.display_cards()}.\n"
+                    "Type the number of the card you want to pick."
+                )
+                msg = await bot.wait_for("message", check=check, timeout=60.0)
+
+                if not msg.content.isdigit():
+                    await ctx.send(f"{current_player.mention}, please enter a valid number!")
+                    continue
+
+                chosen_card = int(msg.content)
+
+                if chosen_card not in game.card_map:
+                    await ctx.send(
+                        f"{current_player.mention}, that card is either invalid or has already been picked! Please choose again."
+                    )
+                    continue
+
+                valid_choice = True
+
+            except Exception:
+                await ctx.send(
+                    f"{current_player.mention} took too long to pick a card and is eliminated!"
+                )
+                game.active_players.remove(current_player)
+                game.losers.append(current_player)
+                break
+
+        if not valid_choice:
+            continue  # Skip to next player if they failed to choose
+
+        # Process the chosen card
+        card = game.pick_card(current_player, chosen_card)
+        if card == 'BOMB':
+            await ctx.send(
+                f"{current_player.mention} picked card {chosen_card} and got a 💣 BOMB! They are eliminated!"
+            )
+        else:
+            await ctx.send(
+                f"{current_player.mention} picked card {chosen_card} and got a ✅ SAFE card!"
+            )
+
+        if game.check_game_end():
+            break
+
+        turn += 1
+
+    winner = game.winner
+    if winner:
+        current_chips = get_or_create_chips(winner.id)['chips']
+        update_player_chips(winner.id, current_chips + 100)
+        await ctx.send(
+            f"🎉 {winner.mention} is the winner and earns 100 chips! Congratulations!"
+        )
+    else:
+        await ctx.send("No winner this time!")
+
+    # Display everyone's final chip counts
+    results = "\n".join(
+        [f"{player.mention}: {get_or_create_chips(player.id)['chips']} 🪙" for player in players]
+    )
+    await ctx.send(f"Final chip counts:\n{results}")
 
 @bot.event
 async def on_ready():
