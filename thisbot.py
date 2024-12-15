@@ -81,6 +81,7 @@ class PokerGame:
         self.table_cards = []
         self.current_bet = 0
         self.active_players = players[:]
+        self.revealed_cards = 0
 
     def deal_hands(self, deck):
         """Give cards to each player."""
@@ -88,8 +89,15 @@ class PokerGame:
             self.players[player]['hand'] = [deck.pop() for _ in range(2)]
 
     def deal_table(self, deck):
-        """Display cards on the table."""
-        self.table_cards = [deck.pop() for _ in range(5)]
+        """Deal table cards in phases."""
+        if self.revealed_cards < 3:  # First phase: Deal no cards
+            self.table_cards = []
+        elif self.revealed_cards < 4:  # Second phase: Reveal 3 cards
+            self.table_cards = [deck.pop() for _ in range(3)]
+        elif self.revealed_cards < 5:  # Third phase: Reveal 1 more card
+            self.table_cards = self.table_cards + [deck.pop()]
+        else:  # Final phase: Reveal all 5 cards
+            self.table_cards = self.table_cards + [deck.pop()]
 
     def place_bet(self, player, amount):
         """Bet chips."""
@@ -272,44 +280,67 @@ async def poker(ctx, *players: discord.Member):
         except discord.Forbidden:
             await ctx.send(f"Could not send a DM to {player.mention}. They need to enable DMs from server members.")
 
-    # Send table cards in the channel
-    await ctx.send(f"Table cards: {' '.join(game.table_cards)}")
+    # Betting and turn phases
+    turn = 1
+    for _ in range(4):
+        if turn == 1:
+            # No cards revealed in the first turn
+            await ctx.send(f"Turn {turn}: No table cards revealed yet.")
+        elif turn == 2:
+            # Reveal 3 cards
+            game.table_cards = [deck.pop() for _ in range(3)]
+            await ctx.send(f"Turn {turn}: Table cards revealed: {' '.join(game.table_cards)}")
+        elif turn == 3:
+            # Reveal 1 card
+            game.table_cards.append(deck.pop())
+            await ctx.send(f"Turn {turn}: One more card revealed: {game.table_cards[-1]}")
+            await ctx.send(f"Current table cards: {' '.join(game.table_cards)}")
+        elif turn == 4:
+            # Reveal the last card
+            game.table_cards.append(deck.pop())
+            await ctx.send(f"Turn {turn}: The final table card revealed: {game.table_cards[-1]}")
+            await ctx.send(f"Current table cards: {' '.join(game.table_cards)}")
 
-    # Betting phase
-    for player in players:
-        if game.players[player]['folded']:
-            continue
+        # Betting phase
+        for player in players:
+            if game.players[player]['folded']:
+                continue
 
-        await ctx.send(f"{player.mention}, it's your turn! Current bet: {game.current_bet} 🪙. Your chips: {game.players[player]['chips']} 🪙. Type \\*bet <amount> or \\*fold.")
+            await ctx.send(f"{player.mention}, it's your turn! Current bet: {game.current_bet} 🪙. Your chips: {game.players[player]['chips']} 🪙. Type \\*bet <amount>, \\*fold, or \\*check.")
 
-        def check(m):
-            return m.author == player and (m.content.startswith("*bet") or m.content == "*fold")
+            def check(m):
+                return m.author == player and (m.content.startswith("*bet") or m.content == "*fold" or m.content == "*check")
 
-        while True:
-            try:
-                msg = await bot.wait_for('message', check=check, timeout=60.0)
+            while True:
+                try:
+                    msg = await bot.wait_for('message', check=check, timeout=60.0)
 
-                if msg.content.startswith("*bet"):
-                    try:
-                        amount = int(msg.content.split()[1])
-                        if amount <= 0:
-                            await ctx.send(f"{player.mention}, you must bet a positive amount!")
-                        elif amount > game.players[player]['chips']:
-                            await ctx.send(f"{player.mention}, you don't have enough chips to bet {amount}!")
-                        else:
-                            game.place_bet(player, amount)
-                            await ctx.send(f"{player.mention} bets {amount} 🪙.")
-                            break
-                    except ValueError:
-                        await ctx.send(f"{player.mention}, please enter a valid number for the bet amount!")
-                elif msg.content == "*fold":
+                    if msg.content.startswith("*bet"):
+                        try:
+                            amount = int(msg.content.split()[1])
+                            if amount <= 0:
+                                await ctx.send(f"{player.mention}, you must bet a positive amount!")
+                            elif amount > game.players[player]['chips']:
+                                await ctx.send(f"{player.mention}, you don't have enough chips to bet {amount}!")
+                            else:
+                                game.place_bet(player, amount)
+                                await ctx.send(f"{player.mention} bets {amount} 🪙.")
+                                break
+                        except ValueError:
+                            await ctx.send(f"{player.mention}, please enter a valid number for the bet amount!")
+                    elif msg.content == "*fold":
+                        game.fold(player)
+                        await ctx.send(f"{player.mention} folds.")
+                        break
+                    elif msg.content == "*check":
+                        await ctx.send(f"{player.mention} checks. No bet made.")
+                        break
+                except Exception:
+                    await ctx.send(f"{player.mention} took too long and has been folded.")
                     game.fold(player)
-                    await ctx.send(f"{player.mention} folds.")
                     break
-            except Exception:
-                await ctx.send(f"{player.mention} took too long and has been folded.")
-                game.fold(player)
-                break
+
+        turn += 1
 
     # Determine winner
     winners, max_score, scores, winner_cards = game.determine_winner()
