@@ -5,6 +5,7 @@ import json
 from decouple import config
 from collections import Counter
 from datetime import timedelta, datetime
+from itertools import combinations
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -180,9 +181,31 @@ def evaluate_hand(hand, table_cards):
 
     def is_flush():
         return any(count >= 5 for count in cards_by_suit.values())
+    
+    def is_straight_flush(hand):
+        """Check if the hand is a straight flush (straight + all same suit)"""
+        possible_hands = combinations(range(len(hand)), 5)
+        rank_values_dict = {rank: i for i, rank in enumerate(rank_values, start=2)}
+        # Check each combination for a straight flush
+        for indices in possible_hands:
+            # Extract the selected cards and their ranks and suits
+            selected_cards = [hand[i] for i in indices]
+            selected_ranks = [selected_cards[i].split()[1] for i in range(5)]
+            selected_suits = [selected_cards[i].split()[2].strip() for i in range(5)]
+
+            selected_rank_values = [rank_values_dict[rank] for rank in selected_ranks]
+            selected_rank_values.sort()
+
+            if all(selected_rank_values[i + 1] - selected_rank_values[i] == 1 for i in range(4)):
+                if len(set(selected_suits)) == 1:
+                    return True
+
+        return False
+
     is_flush_hand = is_flush()
     straight = is_straight(sorted_ranks)
-    if is_flush_hand and straight:  # Straight flush
+    is_straight_flush_hand = is_straight_flush(combined)
+    if is_straight_flush_hand:  # Straight flush
         return 9, sorted_ranks[:5]
     if rank_count[0] == 4:  # Four of a kind
         return 8, [sorted_ranks[0], sorted_ranks[1]]

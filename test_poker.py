@@ -27,10 +27,20 @@ def test_straight():
     print(f"Straight Test - Score: {score}, Best Hand: {best_hand}")
     assert score == 5, "Test failed! Expected Straight (score 5)."
 
+def test_flush():
+    """Test when card form a flush"""
+    hand = ['[ A ♦ ]', '[ 10 ♦ ]', '[ J ♦ ]', '[ Q ♦ ]', '[ K ♠ ]']
+    table_cards = ['[ 2 ♦ ]']
+    
+    score, best_hand = evaluate_hand(hand, table_cards)
+    
+    print(f"Flush Test - Score: {score}, Best Hand: {best_hand}")
+    assert score == 6, "Test failed! Expected Flush (score 6)."
+
 def test_straight_flush():
     """Test when card form a straight flush."""
-    hand = ['[ 5 ♦ ]', '[ 6 ♦ ]', '[ 7 ♦ ]', '[ 8 ♦ ]', '[ 9 ♦ ]']
-    table_cards = []
+    hand = ['[ 4 ♥ ]', '[ 6 ♦ ]', '[ 7 ♦ ]', '[ 8 ♦ ]', '[ 9 ♦ ]']
+    table_cards = ['[ 5 ♠ ]', '[ 5 ♦ ]']
     
     score, best_hand = evaluate_hand(hand, table_cards)
     
@@ -41,3 +51,4 @@ def test_straight_flush():
 if __name__ == '__main__':
     test_straight()
     test_straight_flush()
+    test_flush()
