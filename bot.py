@@ -270,6 +270,78 @@ async def bombgame(ctx, *players: discord.Member):
     )
     await ctx.send(f"Final chip counts:\n{results}")
 
+@bot.command()
+async def slot(ctx):
+    """Play a slot machine game for 10 chips."""
+    player_id = ctx.author.id
+    data = load_player_data()
+
+    # Ensure the player has enough chips
+    if str(player_id) not in data or data[str(player_id)]['chips'] < 10:
+        await ctx.send(f"{ctx.author.mention}, you need at least 10 🪙 to play the slot machine!")
+        return
+
+    # Deduct the entry fee
+    update_player_chips(player_id, data[str(player_id)]['chips'] - 10)
+
+    # Weighted slot symbols with probabilities
+    symbols = ["🍒", "🍋", "🍉", "⭐", "🔔", "🎹", "7️⃣"]
+    weights = [30, 25, 20, 15, 5, 4, 1]
+
+    # Function to select a symbol based on weights
+    def weighted_choice(symbols, weights):
+        return random.choices(symbols, weights, k=1)[0]
+
+    # Generate the slot machine grid ensuring no vertical matches
+    grid = []
+    for _ in range(3):  # 3 rows
+        row = []
+        for col in range(3):  # 3 columns
+            symbol = weighted_choice(symbols, weights)
+            # Ensure that no vertical match occurs
+            while any(symbol == grid[r][col] for r in range(len(grid))):
+                symbol = weighted_choice(symbols, weights)
+            row.append(symbol)
+        grid.append(row)
+
+    # Format the grid for display
+    grid_display = "\n".join([" | ".join(row) for row in grid])
+
+    # Define rewards for each symbol
+    symbol_rewards = {
+        "🍒": 50,
+        "🍋": 100,
+        "🍉": 200,
+        "⭐": 500,
+        "🔔": 1000,
+        "🎹": 3000,
+        "7️⃣": 7777
+    }
+
+    # Check for winning combinations
+    prize = 0
+
+    # Horizontal lines
+    for row in grid:
+        if row[0] == row[1] == row[2]:
+            prize += symbol_rewards[row[0]]
+
+    # Diagonal lines
+    if grid[0][0] == grid[1][1] == grid[2][2]:
+        prize += symbol_rewards[grid[0][0]]
+    if grid[0][2] == grid[1][1] == grid[2][0]:
+        prize += symbol_rewards[grid[0][2]]
+
+    # Respond with the slot result
+    await ctx.send(f"{ctx.author.mention} rolled the slot machine using 10 🪙!\n```{grid_display}```")
+
+    if prize > 0:
+        current_chips = data[str(player_id)]['chips']
+        update_player_chips(player_id, current_chips + prize)
+        await ctx.send(f"🎉 {ctx.author.mention}, you won {prize} 🪙! Your new balance is {current_chips + prize} 🪙.")
+    else:
+        await ctx.send(f"{ctx.author.mention}, better luck next time! You didn't win any chips this time.")
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
