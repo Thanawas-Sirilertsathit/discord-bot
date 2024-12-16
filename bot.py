@@ -7,6 +7,7 @@ from helper_functions import *
 from poker import PokerGame
 from bombgame import BombCardGame
 from discord.ext.commands import BucketType
+from crop import *
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -356,6 +357,134 @@ async def slot_error(ctx, error):
         )
         await ctx.send(cooldown_message)
         return
+
+@bot.command()
+async def farm(ctx, crop: str):
+    """Plant a crop in one of your fields (*farm <crop>)."""
+    player_id = ctx.author.id
+    data = load_player_data()
+
+    # Check if user exists in data
+    if str(player_id) not in data:
+        data[str(player_id)] = {
+            'chips': 1000,
+            'fields': [None] * 5
+        }
+    else:
+        user_data = data[str(player_id)]
+        if 'fields' not in user_data:
+            user_data['fields'] = [None] * 5
+
+    user_data = data[str(player_id)]
+
+    # Check if user has enough chips to buy seeds (10 chips per seed)
+    seed_cost = 10
+    if user_data['chips'] < seed_cost:
+        await ctx.send(f"{ctx.author.mention}, you need at least {seed_cost} 🪙 to buy seeds!")
+        return
+
+    # Validate crop
+    if crop.lower() not in CROP_GROWTH:
+        available_crops = ', '.join([f"{CROP_EMOJI[key]} ({key})" for key in CROP_GROWTH.keys()])
+        await ctx.send(f"{ctx.author.mention}, invalid crop! Available crops: {available_crops}.")
+        return
+
+    # Find an empty field
+    try:
+        empty_field_index = user_data['fields'].index(None)
+    except ValueError:
+        await ctx.send(f"{ctx.author.mention}, all your fields are currently in use. Harvest your crops first!")
+        return
+
+    # Deduct the seed cost and plant the crop
+    user_data['chips'] -= seed_cost
+    crop_name = crop.lower()
+    user_data['fields'][empty_field_index] = {
+        'crop': crop_name,
+        'plant_time': datetime.now().isoformat(),
+        'growth_time': CROP_GROWTH[crop_name]
+    }
+
+    save_player_data(data)
+    growth_time_minutes = CROP_GROWTH[crop_name] // 60
+    await ctx.send(f"{ctx.author.mention}, you planted {CROP_EMOJI[crop_name]} in field {empty_field_index + 1}! It will be ready to harvest in {growth_time_minutes} minutes.")
+
+
+@bot.command()
+async def harvest(ctx):
+    """Harvest your crops and earn chips (*harvest)."""
+    player_id = ctx.author.id
+    data = load_player_data()
+
+    if str(player_id) not in data:
+        await ctx.send(f"{ctx.author.mention}, you don't have any crops to harvest!")
+        return
+
+    user_data = data[str(player_id)]
+    fields = user_data['fields']
+    now = datetime.now()
+
+    total_earnings = 0
+    harvested_crops = []
+
+    for i, field in enumerate(fields):
+        if field is not None:
+            plant_time = datetime.fromisoformat(field['plant_time'])
+            growth_time = timedelta(seconds=field['growth_time'])
+
+            if now >= plant_time + growth_time:
+                crop = field['crop']
+                min_yield, max_yield = CROP_YIELD[crop]
+                earnings = random.randint(min_yield, max_yield)
+                total_earnings += earnings
+                harvested_crops.append((i + 1, CROP_EMOJI[crop], earnings))
+                fields[i] = None  # Clear the field after harvesting
+
+    if total_earnings > 0:
+        user_data['chips'] += total_earnings
+        save_player_data(data)
+
+        crop_details = "\n".join([f"Field {field}: {emoji} (+{earnings} 🪙)" for field, emoji, earnings in harvested_crops])
+        await ctx.send(
+            f"{ctx.author.mention}, you harvested the following crops:\n{crop_details}\n"
+            f"You earned a total of {total_earnings} 🪙! Your new balance is {user_data['chips']} 🪙."
+        )
+    else:
+        await ctx.send(f"{ctx.author.mention}, none of your crops are ready to harvest yet! Check back later.")
+
+@bot.command()
+async def view_farm(ctx):
+    """View the status of your farm (*view_farm)."""
+    player_id = ctx.author.id
+    data = load_player_data()
+
+    if str(player_id) not in data:
+        await ctx.send(f"{ctx.author.mention}, you don't have any fields yet! Plant some crops to get started.")
+        return
+
+    user_data = data[str(player_id)]
+    fields = user_data.get('fields', [None] * 5)
+    now = datetime.now()
+
+    field_status = []
+    for i, field in enumerate(fields):
+        if field is None:
+            field_status.append(f"Field {i + 1}: Empty 🌱")
+        else:
+            crop = field['crop']
+            plant_time = datetime.fromisoformat(field['plant_time'])
+            growth_time = timedelta(seconds=field['growth_time'])
+            harvestable = now >= plant_time + growth_time
+
+            status = "Ready to harvest ✅" if harvestable else "Still growing ⏳"
+            time_left = max((plant_time + growth_time - now).seconds // 60, 0)
+            field_status.append(
+                f"Field {i + 1}: {CROP_EMOJI[crop]} ({crop}) - {status} "
+                f"({time_left} minutes left)" if not harvestable else f"Field {i + 1}: {CROP_EMOJI[crop]} ({crop}) - {status}"
+            )
+
+    farm_status = "\n".join(field_status)
+    await ctx.send(f"{ctx.author.mention}, here is the status of your farm:\n{farm_status}")
 
 @bot.event
 async def on_ready():
