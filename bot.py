@@ -68,6 +68,8 @@ async def poker(ctx, *players: discord.Member):
     # Betting and turn phases
     turn = 1
     for _ in range(4):
+        if len(game.active_players) <= 1:
+            break
         if turn == 1:
             # No cards revealed in the first turn
             await ctx.send(f"Turn {turn}: No table cards revealed yet.")
