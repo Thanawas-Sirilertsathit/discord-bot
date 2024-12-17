@@ -169,16 +169,14 @@ async def daily(ctx):
 
 @bot.command()
 async def balance(ctx, user: discord.Member = None):
-    """Check your current chip balance."""
+    """Check your current chip balance or create account."""
     if user is None:
         user = ctx.author
 
     data = load_player_data()
-    if str(user.id) in data:
-        current_chips = data[str(user.id)]['chips']
-        await ctx.send(f"{user.mention}, your current balance is {current_chips} 🪙.")
-    else:
-        await ctx.send(f"{user.mention}, you don't have any 🪙 yet.")
+    player_data = get_or_create_chips(user.id)
+    current_chips = player_data['chips']
+    await ctx.send(f"{user.mention}, your current balance is {current_chips} 🪙.")
 
 
 @bot.command()
@@ -487,6 +485,36 @@ async def view_farm(ctx):
 
     farm_status = "\n".join(field_status)
     await ctx.send(f"{ctx.author.mention}, here is the status of your farm:\n{farm_status}")
+
+@bot.command()
+async def leaderboard(ctx):
+    """View the leaderboard for the top 10 users with the most chips in the server."""
+    data = load_player_data()
+    guild_members = ctx.guild.members
+
+    leaderboard_data = []
+    for player_id, player_data in data.items():
+        try:
+            member = await ctx.guild.fetch_member(int(player_id))
+        except (discord.NotFound, discord.HTTPException):
+            member = None
+        if member and not member.bot:
+            leaderboard_data.append((member, player_data['chips']))
+
+    leaderboard_data.sort(key=lambda x: x[1], reverse=True)
+    top_users = leaderboard_data[:10]
+
+    if not top_users:
+        await ctx.send("No players with chips found in this server!")
+        return
+
+    # Format the leaderboard
+    leaderboard_message = "**🏆 Server Leaderboard 🏆**\n"
+    for rank, (member, chips) in enumerate(top_users, start=1):
+        leaderboard_message += f"**{rank}.** {member.display_name} - {chips} 🪙\n"
+
+    await ctx.send(leaderboard_message)
+
 
 @bot.event
 async def on_ready():
