@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 decouple_config.py
 econ_data.json
+fountain.json
