@@ -8,6 +8,7 @@ from poker import PokerGame
 from bombgame import BombCardGame
 from discord.ext.commands import BucketType
 from crop import *
+from fountain import *
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -603,6 +604,25 @@ async def leaderboard(ctx):
 
     await ctx.send(leaderboard_message)
 
+@bot.command()
+async def fountain(ctx):
+    """Throw 1 chip into Kanade's Wish Fountain and pray for good fortune!"""
+    player_id = ctx.author.id
+    data = load_player_data()
+
+    user_data = get_or_create_chips(player_id)
+
+    # Check if the user has at least 1 chip to throw into the fountain
+    if user_data['chips'] < 1:
+        await ctx.send(f"{ctx.author.mention}, you need at least 1 🪙 to throw into the Wish Fountain!")
+        return
+
+    # Deduct 1 chip from the user
+    user_data['chips'] -= 1
+    result = random.choice(OUTCOMES)
+    await ctx.send(f"{ctx.author.mention}, you threw 1 🪙 into the Wish Fountain! {result}")
+
+    save_player_data(data)
 
 @bot.event
 async def on_ready():
