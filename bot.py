@@ -458,6 +458,9 @@ async def farm(ctx, crop: str, amount: str = "1"):
     else:
         try:
             amount = int(amount)
+            if amount <= 0:
+                await ctx.send(f"{ctx.author.mention}, please provide a valid amount (or 'all').")
+                return
         except ValueError:
             await ctx.send(f"{ctx.author.mention}, please provide a valid amount (or 'all').")
             return
@@ -475,7 +478,7 @@ async def farm(ctx, crop: str, amount: str = "1"):
         await ctx.send(f"{ctx.author.mention}, invalid crop! Available crops: {available_crops}.")
         return
 
-    if len(empty_fields) < amount:
+    if len(empty_fields) < amount or amount <= 0:
         await ctx.send(f"{ctx.author.mention}, you don't have enough empty fields. You have {len(empty_fields)} empty fields.")
         return
 
