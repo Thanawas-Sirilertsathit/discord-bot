@@ -433,8 +433,8 @@ async def slot_error(ctx, error):
         return
 
 @bot.command()
-async def farm(ctx, crop: str):
-    """Plant a crop in one of your fields (*farm <crop>)."""
+async def farm(ctx, crop: str, amount: str = "1"):
+    """Plant a crop in one of your fields (*farm <crop> [amount])."""
     player_id = ctx.author.id
     data = load_player_data()
 
@@ -450,11 +450,23 @@ async def farm(ctx, crop: str):
             user_data['fields'] = [None] * 5
 
     user_data = data[str(player_id)]
+    empty_fields = [i for i, field in enumerate(user_data['fields']) if field is None]
+    # Validate amount (either "all" or an integer)
+    if amount.lower() == "all":
+        seed_cost = 10
+        amount = len(empty_fields)
+    else:
+        try:
+            amount = int(amount)
+        except ValueError:
+            await ctx.send(f"{ctx.author.mention}, please provide a valid amount (or 'all').")
+            return
 
-    # Check if user has enough chips to buy seeds (10 chips per seed)
+    # Check if the user has enough chips to buy the seeds
     seed_cost = 10
-    if user_data['chips'] < seed_cost:
-        await ctx.send(f"{ctx.author.mention}, you need at least {seed_cost} 🪙 to buy seeds!")
+    total_cost = seed_cost * amount
+    if user_data['chips'] < total_cost:
+        await ctx.send(f"{ctx.author.mention}, you need at least {total_cost} 🪙 to plant {amount} {crop}(s)!")
         return
 
     # Validate crop
@@ -463,26 +475,25 @@ async def farm(ctx, crop: str):
         await ctx.send(f"{ctx.author.mention}, invalid crop! Available crops: {available_crops}.")
         return
 
-    # Find an empty field
-    try:
-        empty_field_index = user_data['fields'].index(None)
-    except ValueError:
-        await ctx.send(f"{ctx.author.mention}, all your fields are currently in use. Harvest your crops first!")
+    if len(empty_fields) < amount:
+        await ctx.send(f"{ctx.author.mention}, you don't have enough empty fields. You have {len(empty_fields)} empty fields.")
         return
 
-    # Deduct the seed cost and plant the crop
-    user_data['chips'] -= seed_cost
+    # Deduct chips and plant crops
+    user_data['chips'] -= total_cost
     crop_name = crop.lower()
-    user_data['fields'][empty_field_index] = {
-        'crop': crop_name,
-        'plant_time': datetime.now().isoformat(),
-        'growth_time': CROP_GROWTH[crop_name]
-    }
+
+    for i in range(amount):
+        empty_field_index = empty_fields[i]
+        user_data['fields'][empty_field_index] = {
+            'crop': crop_name,
+            'plant_time': datetime.now().isoformat(),
+            'growth_time': CROP_GROWTH[crop_name]
+        }
 
     save_player_data(data)
     growth_time_minutes = CROP_GROWTH[crop_name] // 60
-    await ctx.send(f"{ctx.author.mention}, you planted {CROP_EMOJI[crop_name]} in field {empty_field_index + 1}! It will be ready to harvest in {growth_time_minutes} minutes.")
-
+    await ctx.send(f"{ctx.author.mention}, you planted {CROP_EMOJI[crop_name]} {amount} time(s) in fields {', '.join(str(i + 1) for i in empty_fields[:amount])}! Each will be ready to harvest in {growth_time_minutes} minutes.")
 
 @bot.command()
 async def harvest(ctx):
