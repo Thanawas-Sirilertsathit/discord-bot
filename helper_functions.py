@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from collections import Counter
 from itertools import combinations
 DATA_FILE = "econ_data.json"
+FOUNTAIN_DATA_FILE = "fountain.json"
 
 def create_deck():
     """Create a card deck."""
@@ -125,3 +126,16 @@ def evaluate_hand(hand, table_cards):
         return 2, [sorted_ranks[0], sorted_ranks[1], sorted_ranks[2], sorted_ranks[3]]
     # High card
     return 1, sorted_ranks[:5]
+
+def load_fountain_data():
+    """Load fountain json."""
+    try:
+        with open(FOUNTAIN_DATA_FILE, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {}
+
+def save_fountain_data(fountain_data):
+    """Update fountain json."""
+    with open(FOUNTAIN_DATA_FILE, "w") as file:
+        json.dump(fountain_data, file, indent=4)

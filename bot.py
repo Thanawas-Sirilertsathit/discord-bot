@@ -605,11 +605,13 @@ async def leaderboard(ctx):
     await ctx.send(leaderboard_message)
 
 @bot.command()
+@commands.cooldown(1, 10, BucketType.user)
 async def fountain(ctx):
     """Throw 1 chip into Kanade's Wish Fountain and pray for good fortune!"""
     player_id = ctx.author.id
     data = load_player_data()
-
+    fountain_data = load_fountain_data()
+    fountain_coins = fountain_data["fountain_coins"]
     user_data = get_or_create_chips(player_id)
 
     # Check if the user has at least 1 chip to throw into the fountain
@@ -618,14 +620,38 @@ async def fountain(ctx):
         return
 
     user_data['chips'] -= 1
+    fountain_coins += 1
+    fountain_data["fountain_coins"] = fountain_coins
     result = random.choice(OUTCOMES)
-    await ctx.send(f"{ctx.author.mention}, you threw 1 🪙 into the Wish Fountain! {result}")
+    if "LUCKY" in result:  # Lucky outcome
+        user_data['chips'] += fountain_coins
+        await ctx.send(f"{ctx.author.mention}, you threw 1 🪙 into the Wish Fountain! 🎉 "
+                       f"Kanade's Wish Fountain splashed {fountain_coins} 🪙 in front of you! 🎉")
+        fountain_data["fountain_coins"] = 0
+    else:
+        await ctx.send(f"{ctx.author.mention}, you threw 1 🪙 into the Wish Fountain! {result}")
 
     save_player_data(data)
+    save_fountain_data(fountain_data)
+
+@fountain.error
+async def fountain_error(ctx, error):
+    """Handle fountain cooldown error"""
+    if isinstance(error, commands.CommandOnCooldown):
+        retry_after = error.retry_after
+        minutes, seconds = divmod(retry_after, 60)
+        cooldown_message = (
+            f"⏳ {ctx.author.mention}, the fountain is being cleaned! "
+            f"Please wait {int(seconds)} seconds before trying again."
+        )
+        await ctx.send(cooldown_message)
+        return
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    activity = discord.Game(name="Piano 🎹")
+    await bot.change_presence(activity=activity)
+    print(f'Logged in as {bot.user} and status set to Playing Piano 🎹.')
 
 @bot.event
 async def on_command_error(ctx, error):
