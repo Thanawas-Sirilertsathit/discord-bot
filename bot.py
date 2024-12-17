@@ -617,7 +617,6 @@ async def fountain(ctx):
         await ctx.send(f"{ctx.author.mention}, you need at least 1 🪙 to throw into the Wish Fountain!")
         return
 
-    # Deduct 1 chip from the user
     user_data['chips'] -= 1
     result = random.choice(OUTCOMES)
     await ctx.send(f"{ctx.author.mention}, you threw 1 🪙 into the Wish Fountain! {result}")
