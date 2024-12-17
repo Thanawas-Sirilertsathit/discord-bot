@@ -23,6 +23,7 @@ DATA_FILE = "econ_data.json"
 
 
 @bot.command()
+@commands.cooldown(1, 120, BucketType.user)
 async def poker(ctx, *players: discord.Member):
     """Poker game for fun (*poker @player1 @player2 @...)."""
     if not players:
@@ -149,6 +150,18 @@ async def poker(ctx, *players: discord.Member):
     results = "\n".join([f"{player.mention}: {game.players[player]['chips']} 🪙" for player in players])
     await ctx.send(f"Final chip counts:\n{results}")
 
+@poker.error
+async def poker_error(ctx, error):
+    """Handle poker cooldown error"""
+    if isinstance(error, commands.CommandOnCooldown):
+        retry_after = error.retry_after
+        minutes, seconds = divmod(retry_after, 60)
+        cooldown_message = (
+            f"⏳ {ctx.author.mention}, the poker table is being cleaned up! "
+            f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
+        )
+        await ctx.send(cooldown_message)
+        return
 
 @bot.command()
 async def daily(ctx):
@@ -180,6 +193,7 @@ async def balance(ctx, user: discord.Member = None):
 
 
 @bot.command()
+@commands.cooldown(1, 120, BucketType.user)
 async def bombgame(ctx, *players: discord.Member):
     """Start a bomb card game (*bombgame @player1 @player2 ...)."""
     if not players:
@@ -271,6 +285,19 @@ async def bombgame(ctx, *players: discord.Member):
         [f"{player.mention}: {get_or_create_chips(player.id)['chips']} 🪙" for player in players]
     )
     await ctx.send(f"Final chip counts:\n{results}")
+
+@bombgame.error
+async def bombgame_error(ctx, error):
+    """Handle bombgame cooldown error"""
+    if isinstance(error, commands.CommandOnCooldown):
+        retry_after = error.retry_after
+        minutes, seconds = divmod(retry_after, 60)
+        cooldown_message = (
+            f"⏳ {ctx.author.mention}, the bombgame is being prepared! "
+            f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
+        )
+        await ctx.send(cooldown_message)
+        return
 
 @bot.command()
 @commands.cooldown(1, 10, BucketType.user)
