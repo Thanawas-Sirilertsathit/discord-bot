@@ -35,11 +35,35 @@ async def poker(ctx, *players: discord.Member):
         return
 
     players = list(set(players))
+    players = [player for player in players if not player.bot]
     if ctx.author not in players:
         players.append(ctx.author)
 
     if len(players) < 2:
         await ctx.send("You need at least two players!")
+        return
+
+    await ctx.send(f"{', '.join(player.mention for player in players)} are you ready to start the poker game? Reply with 'yes' to accept or 'no' to cancel.")
+    
+    responses = {player: None for player in players}
+
+    def check(msg):
+        return msg.author in players and msg.content.lower() in ["yes", "no"]
+
+    try:
+        # Wait until all players respond (or timeout after 60 seconds)
+        while None in responses.values():
+            msg = await bot.wait_for("message", check=check, timeout=60.0)
+            responses[msg.author] = msg.content.lower()
+            await ctx.send(f"{msg.author.mention} has responded with '{msg.content.lower()}'.")
+
+    except:
+        await ctx.send("Game start timed out. Not all players confirmed in time.")
+        return
+
+    # If any player responds with 'no', cancel the game
+    if any(response == "no" for response in responses.values()):
+        await ctx.send("Game has been canceled because some players did not confirm.")
         return
 
     deck = create_deck()
@@ -201,11 +225,34 @@ async def bombgame(ctx, *players: discord.Member):
         return
 
     players = list(set(players))
+    players = [player for player in players if not player.bot]
     if ctx.author not in players:
         players.append(ctx.author)
 
     if len(players) < 2:
         await ctx.send("You need at least two players!")
+        return
+    await ctx.send(f"{', '.join(player.mention for player in players)} are you ready to start the bomb game? Reply with 'yes' to accept or 'no' to cancel.")
+    
+    responses = {player: None for player in players}
+
+    def check(msg):
+        return msg.author in players and msg.content.lower() in ["yes", "no"]
+
+    try:
+        # Wait until all players respond (or timeout after 60 seconds)
+        while None in responses.values():
+            msg = await bot.wait_for("message", check=check, timeout=60.0)
+            responses[msg.author] = msg.content.lower()
+            await ctx.send(f"{msg.author.mention} has responded with '{msg.content.lower()}'.")
+
+    except:
+        await ctx.send("Game start timed out. Not all players confirmed in time.")
+        return
+
+    # If any player responds with 'no', cancel the game
+    if any(response == "no" for response in responses.values()):
+        await ctx.send("Game has been canceled because some players did not confirm.")
         return
 
     game = BombCardGame(players)
