@@ -733,10 +733,17 @@ async def craft(ctx, item: str):
             if inventory[resource] == 0:
                 del inventory[resource]
 
+    total_seconds = recipe['time']
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    time_str = f"{hours} hour(s) {minutes} minute(s)" if hours > 0 else f"{minutes} minute(s)"
+
     finish_time = (datetime.now() + timedelta(seconds=recipe['time'])).isoformat()
     crafting_slots.append({"item": selected_item, "name": recipe['name'], "finish_time": finish_time})
+    
     save_player_data(data)
-    await ctx.send(f"{ctx.author.mention} has started crafting {selected_item} ({recipe['name']}). It will take {recipe['time']} seconds.")
+    
+    await ctx.send(f"{ctx.author.mention} has started crafting {selected_item} ({recipe['name']}). It will take {time_str}.")
 
 @bot.command()
 async def collect(ctx):
