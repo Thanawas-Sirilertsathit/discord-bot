@@ -11,6 +11,7 @@ from discord.ext.commands import BucketType
 from crop import *
 from fountain import *
 from crafting import *
+from towerdodge import *
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -845,6 +846,75 @@ async def recipe(ctx):
         await ctx.send(embed=embed)
     else:
         await ctx.send(f"{ctx.author.mention}, there are no available recipes.")
+
+@bot.command()
+@commands.cooldown(1, 120, BucketType.user)
+async def plane(ctx):
+    """Start a 11-9 game."""
+    player = ctx.author
+    game = TowerDodge()
+    await ctx.send(f"Starting 11-9 operation! Survive 10 rounds to win. You have 2 lives as twin towers.")
+
+    while game.round < 10 and game.lives > 0:
+        game.next_round()
+        plane_count = 1
+        if game.round >= 5:
+            plane_count = 2
+        if game.round >= 8:
+            plane_count = 3
+        await ctx.send(f"Round {game.round}: There are {plane_count} ✈️ approaching! Choose: left, right, up, or down.")
+
+        def check_move(m):
+            return m.author == player
+
+        valid_move = False
+        while not valid_move:
+            try:
+                msg = await bot.wait_for("message", check=check_move, timeout=30.0)
+                move = msg.content.lower()
+                if move not in game.directions:
+                    await ctx.send(f"{player.mention}, invalid move! Choose left, right, up, or down.")
+                    continue
+                valid_move = True
+            except:
+                await ctx.send(f"{player.mention} did not move in time and loses a life!")
+                if game.hit():
+                    await ctx.send(f"{player.mention} is eliminated!")
+                    return
+                break
+
+        plane_directions = random.sample(game.directions, plane_count)
+        await ctx.send(f"The ✈️ move {', '.join(plane_directions)}!")
+
+        if move in plane_directions:
+            await ctx.send(f"✈️ {player.mention}'s tower moved {move} and got hit 💔!")
+            if game.hit():
+                await ctx.send(f"✈️ {player.mention}! Your tower has been destroyed ❌!")
+                break
+        else:
+            await ctx.send(f"{player.mention}'s tower dodged the planes safely ✅!")
+
+    if game.round == 10 and game.lives > 0:
+        current_chips = get_or_create_chips(player.id)['chips']
+        update_player_chips(player.id, current_chips + 1000)
+        await ctx.send(f"🎉 {player.mention} survived all 10 rounds and earns 1000 chips! Congratulations!")
+    else:
+        await ctx.send(f"Game over, {player.mention}. Better luck next time!")
+
+    results = f"{player.mention}: {get_or_create_chips(player.id)['chips']} 🪙"
+    await ctx.send(f"Final chip count:\n{results}")
+
+@plane.error
+async def plane_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        retry_after = error.retry_after
+        minutes, seconds = divmod(retry_after, 60)
+        cooldown_message = (
+            f"⏳ {ctx.author.mention}, the tower is being prepared! "
+            f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
+        )
+        await ctx.send(cooldown_message)
+
 
 @bot.event
 async def on_ready():
