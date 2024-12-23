@@ -858,10 +858,8 @@ async def plane(ctx):
     while game.round < 10 and game.lives > 0:
         game.next_round()
         plane_count = 1
-        if game.round >= 5:
+        if game.round > 5:
             plane_count = 2
-        if game.round >= 8:
-            plane_count = 3
         await ctx.send(f"Round {game.round}: There are {plane_count} ✈️ approaching! Choose: left, right, up, or down.")
 
         def check_move(m):
