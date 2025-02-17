@@ -26,8 +26,17 @@ BOT_TOKEN = config('BOT_TOKEN')
 # JSON file to store user data
 DATA_FILE = "econ_data.json"
 
+@bot.group(invoke_without_command=True)
+async def game(ctx):
+    """Group for game commands."""
+    await ctx.send("Available games : Bomb game, 11-9 game, Poker and Slot.")
 
-@bot.command()
+@bot.group(invoke_without_command=True)
+async def econ(ctx):
+    """Group for economic related commands."""
+    await ctx.send("Available commands : daily, farm, harvest, view_farm and balance.")
+
+@game.command()
 @commands.cooldown(1, 120, BucketType.user)
 async def poker(ctx, *players: discord.Member):
     """Poker game for fun (*poker @player1 @player2 @...)."""
@@ -192,7 +201,7 @@ async def poker_error(ctx, error):
         await ctx.send(cooldown_message)
         return
 
-@bot.command()
+@econ.command()
 async def daily(ctx):
     """Claim daily 1000 chips."""
     player_id = ctx.author.id
@@ -209,7 +218,7 @@ async def daily(ctx):
         await ctx.send(f"{ctx.author.mention}, you can claim your next daily reward at {next_claim_time.strftime('%Y-%m-%d %H:%M:%S')}.")
 
 
-@bot.command()
+@econ.command()
 async def balance(ctx, user: discord.Member = None):
     """Check your current chip balance or create account."""
     if user is None:
@@ -221,7 +230,7 @@ async def balance(ctx, user: discord.Member = None):
     await ctx.send(f"{user.mention}, your current balance is {current_chips} 🪙.")
 
 
-@bot.command()
+@game.command()
 @commands.cooldown(1, 120, BucketType.user)
 async def bombgame(ctx, *players: discord.Member):
     """Start a bomb card game (*bombgame @player1 @player2 ...)."""
@@ -351,7 +360,7 @@ async def bombgame_error(ctx, error):
         await ctx.send(cooldown_message)
         return
 
-@bot.command()
+@game.command()
 @commands.cooldown(1, 10, BucketType.user)
 async def slot(ctx):
     """Play a slot machine game for 10 chips."""
@@ -437,7 +446,7 @@ async def slot_error(ctx, error):
         await ctx.send(cooldown_message)
         return
 
-@bot.command()
+@econ.command()
 async def farm(ctx, crop: str, amount: str = "1"):
     """Plant a crop in one of your fields (*farm <crop> [amount])."""
     player_id = ctx.author.id
@@ -503,7 +512,7 @@ async def farm(ctx, crop: str, amount: str = "1"):
     growth_time_minutes = CROP_GROWTH[crop_name] // 60
     await ctx.send(f"{ctx.author.mention}, you planted {CROP_EMOJI[crop_name]} {amount} time(s) in fields {', '.join(str(i + 1) for i in empty_fields[:amount])}! Each will be ready to harvest in {growth_time_minutes} minutes.")
 
-@bot.command()
+@econ.command()
 async def harvest(ctx):
     """Harvest your crops and earn chips (*harvest)."""
     player_id = ctx.author.id
@@ -545,7 +554,7 @@ async def harvest(ctx):
     else:
         await ctx.send(f"{ctx.author.mention}, none of your crops are ready to harvest yet! Check back later.")
 
-@bot.command()
+@econ.command()
 async def view_farm(ctx):
     """View the status of your farm (*view_farm)."""
     player_id = ctx.author.id
@@ -651,204 +660,7 @@ async def fountain_error(ctx, error):
         await ctx.send(cooldown_message)
         return
 
-@bot.command()
-@commands.cooldown(1, 300, commands.BucketType.user)
-async def mine(ctx):
-    """Mine for random resources for crafting objects."""
-    data = load_player_data()
-    user_id = str(ctx.author.id)
-    if user_id not in data:
-        data[user_id] = {"chips": 0, "fields": [], "inventory": {}, "crafting_slots": []}
-
-    inventory = data[user_id].setdefault("inventory", {})
-    mine_amount = random.randint(3,6)
-    mine_array = []
-    for i in range(mine_amount):
-        mined_item = random.choice(RESOURCE)
-        mine_array.append(mined_item)
-        if mined_item not in inventory:
-            inventory[mined_item] = 0
-        inventory[mined_item] += 1
-        save_player_data(data)
-    mined_items_display = ', '.join(mine_array)
-    await ctx.send(f"{ctx.author.mention} mined {mined_items_display}! It's added to your inventory.")
-
-@mine.error
-async def mine_error(ctx, error):
-    """Handle mine cooldown error."""
-    if isinstance(error, commands.CommandOnCooldown):
-        retry_after = error.retry_after
-        minutes, seconds = divmod(retry_after, 60)
-        cooldown_message = (
-            f"⛏️ {ctx.author.mention}, you need to wait {int(minutes)} minutes and {int(seconds)} seconds to mine again."
-        )
-        await ctx.send(cooldown_message)
-
-@bot.command()
-async def inventory(ctx):
-    """Check your inventory."""
-    user_id = str(ctx.author.id)
-    data = load_player_data()
-    if user_id not in data or not data[user_id].get("inventory"):
-        await ctx.send(f"{ctx.author.mention}, your inventory is empty. Start mining to gather resources!")
-        return
-
-    inventory = data[user_id]["inventory"]
-    inv = '\n'.join([f"{item}: {count}" for item, count in inventory.items()])
-    await ctx.send(f"{ctx.author.mention}'s Inventory:\n{inv}")
-
-@bot.command()
-async def craft(ctx, item: str):
-    """Craft an item using resources."""
-    data = load_player_data()
-    user_id = str(ctx.author.id)
-    if user_id not in data:
-        data[user_id] = {"chips": 0, "fields": [], "inventory": {}, "crafting_slots": []}
-    inventory = data[user_id].setdefault("inventory", {})
-    crafting_slots = data[user_id].setdefault("crafting_slots", [])
-    if len(crafting_slots) >= 3:
-        await ctx.send(f"{ctx.author.mention}, you already have 3 crafting slots in use. Wait for a slot to free up.")
-        return
-    selected_item = None
-    for emoji, recipe in CRAFTING_RECIPE.items():
-        if item.lower() == recipe['name'].lower() or item == emoji:
-            selected_item = emoji
-            break
-    if not selected_item:
-        available_items = ', '.join([f"{emoji} ({recipe['name']})" for emoji, recipe in CRAFTING_RECIPE.items()])
-        await ctx.send(f"{ctx.author.mention}, unknown item. Available items to craft: {available_items}")
-        return
-    recipe = CRAFTING_RECIPE[selected_item]
-    missing_items = [
-        f"{resource} ({amount - inventory.get(resource, 0)} more needed)"
-        for resource, amount in recipe.items()
-        if resource not in ['time', 'value', 'name'] and inventory.get(resource, 0) < amount
-    ]
-    if missing_items:
-        await ctx.send(
-            f"{ctx.author.mention}, you don't have enough resources to craft {selected_item} ({recipe['name']}). Missing: {', '.join(missing_items)}"
-        )
-        return
-    for resource, amount in recipe.items():
-        if resource not in ['time', 'value', 'name']:
-            inventory[resource] -= amount
-            if inventory[resource] == 0:
-                del inventory[resource]
-
-    total_seconds = recipe['time']
-    hours = total_seconds // 3600
-    minutes = (total_seconds % 3600) // 60
-    time_str = f"{hours} hour(s) {minutes} minute(s)" if hours > 0 else f"{minutes} minute(s)"
-
-    finish_time = (datetime.now() + timedelta(seconds=recipe['time'])).isoformat()
-    crafting_slots.append({"item": selected_item, "name": recipe['name'], "finish_time": finish_time})
-    
-    save_player_data(data)
-    
-    await ctx.send(f"{ctx.author.mention} has started crafting {selected_item} ({recipe['name']}). It will take {time_str}.")
-
-@bot.command()
-async def collect(ctx):
-    """Collect completed crafting items and sell them for money."""
-    data = load_player_data()
-    user_id = str(ctx.author.id)
-    if user_id not in data:
-        data[user_id] = {"chips": 0, "fields": [], "inventory": {}, "crafting_slots": []}
-
-    crafting_slots = data[user_id].setdefault("crafting_slots", [])
-    inventory = data[user_id].setdefault("inventory", {})
-
-    # Check for completed crafting jobs
-    current_time = datetime.now()
-    completed_items = []
-
-    for slot in crafting_slots[:]:
-        finish_time = datetime.fromisoformat(slot['finish_time'])
-        if current_time >= finish_time:
-            completed_items.append(slot)
-            crafting_slots.remove(slot)
-
-    if not completed_items:
-        await ctx.send(f"{ctx.author.mention}, you have no completed crafting jobs to collect.")
-        return
-
-    total_coins = 0
-    for item in completed_items:
-        crafted_item = item['item']
-        inventory[crafted_item] = inventory.get(crafted_item, 0) + 1
-        recipe = CRAFTING_RECIPE[crafted_item]
-        total_coins += recipe['value']
-
-    data[user_id]['chips'] += total_coins
-    save_player_data(data)
-
-    collected_summary = ', '.join([f"{item['item']} ({CRAFTING_RECIPE[item['item']]['name']})" for item in completed_items])
-    await ctx.send(
-        f"{ctx.author.mention}, you collected the following items: {collected_summary}. "
-        f"You earned a total of {total_coins} coins!"
-    )
-
-@bot.command()
-async def view_craft(ctx):
-    """View current crafting slots and their remaining time."""
-    data = load_player_data()
-    user_id = str(ctx.author.id)
-    
-    if user_id not in data:
-        data[user_id] = {"chips": 0, "fields": [], "inventory": {}, "crafting_slots": []}
-    
-    crafting_slots = data[user_id].setdefault("crafting_slots", [])
-
-    if not crafting_slots:
-        await ctx.send(f"{ctx.author.mention}, you have no active crafting jobs.")
-        return
-
-    current_time = datetime.now()
-    craft_status = []
-
-    for i, slot in enumerate(crafting_slots, start=1):
-        finish_time = datetime.fromisoformat(slot['finish_time'])
-        remaining_time = (finish_time - current_time).total_seconds()
-
-        if remaining_time > 0:
-            hours, remainder = divmod(int(remaining_time), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            time_left = f"{hours}h {minutes}m {seconds}s" if hours > 0 else f"{minutes}m {seconds}s"
-        else:
-            time_left = "Ready to collect ✅"
-
-        craft_status.append(f"{i}. {slot['item']} ({slot['name']}) - {time_left}")
-
-    status_message = "\n".join(craft_status)
-    await ctx.send(f"{ctx.author.mention}, your current crafting jobs:\n{status_message}")
-
-@bot.command()
-async def recipe(ctx):
-    """List of all crafting recipes."""
-    available_recipes = []
-    for emoji, recipe in CRAFTING_RECIPE.items():
-        total_seconds = recipe['time']
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        time_str = f"{hours} hour(s) {minutes} minute(s)" if hours > 0 else f"{minutes} minute(s)"
-        resources_needed = '\n'.join([f"{resource}: {amount}" for resource, amount in recipe.items() if resource not in ['time', 'value', 'name']])
-        available_recipes.append(f"{emoji} - {recipe['name']} (Time: {time_str})\nResources:\n{resources_needed}")
-
-    if available_recipes:
-        embed = discord.Embed(
-            title="Available Crafting Recipes",
-            description=f"Here are the available crafting recipes, {ctx.author.mention}:",
-            color=discord.Color.orange()
-        )
-
-        for recipe_info in available_recipes:
-            embed.add_field(name="Recipe", value=recipe_info, inline=False)
-        
-        await ctx.send(embed=embed)
-    else:
-        await ctx.send(f"{ctx.author.mention}, there are no available recipes.")
-
-@bot.command()
+@game.command()
 @commands.cooldown(1, 120, BucketType.user)
 async def plane(ctx):
     """Start a 11-9 game."""
@@ -910,75 +722,6 @@ async def plane_error(ctx, error):
         minutes, seconds = divmod(retry_after, 60)
         cooldown_message = (
             f"⏳ {ctx.author.mention}, the tower is being prepared! "
-            f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
-        )
-        await ctx.send(cooldown_message)
-
-@bot.command()
-@commands.cooldown(1, 120, BucketType.user)
-async def gomoku(ctx, player2: discord.Member):
-    """Play a Gomoku game together."""
-    player1 = ctx.author
-    if player1 == player2:
-        await ctx.send("You can't play against yourself!")
-        return
-    
-    players = [player1, player2]
-    await ctx.send(f"{', '.join(player.mention for player in players)} are you ready to start the gomoku game? Reply with 'yes' to accept or 'no' to cancel.")
-    
-    responses = {player: None for player in players}
-
-    def check(msg):
-        return msg.author in players and msg.content.lower() in ["yes", "no"]
-
-    try:
-        # Wait until all players respond (or timeout after 60 seconds)
-        while None in responses.values():
-            msg = await bot.wait_for("message", check=check, timeout=60.0)
-            responses[msg.author] = msg.content.lower()
-            await ctx.send(f"{msg.author.mention} has responded with '{msg.content.lower()}'.")
-
-    except:
-        await ctx.send("Game start timed out. Not all players confirmed in time.")
-        return
-
-    if any(response == "no" for response in responses.values()):
-        await ctx.send("Game has been canceled because some players did not confirm.")
-        return
-
-    game = Gomoku(player1, player2)
-    await ctx.send(f"{player1.mention} vs {player2.mention}! Game start!\n{game.display_board()}")
-
-    while not game.winner:
-        await ctx.send(f"{game.current_player.mention}, it's your turn! Use `*place x y` to place your piece (0-14).")
-
-        def check(msg):
-            return msg.author == game.current_player and msg.content.startswith("*place")
-
-        try:
-            msg = await bot.wait_for("message", check=check, timeout=60.0)
-            _, x, y = msg.content.split()
-            x, y = int(x), int(y)
-            if 0 <= x < 15 and 0 <= y < 15 and game.place_piece(x, y):
-                await ctx.send(f"Move placed at {x}, {y}\n{game.display_board()}")
-            else:
-                await ctx.send("Invalid move! Try again.")
-                continue
-        except Exception:
-            await ctx.send(f"{game.current_player.mention} took too long! Game forfeited.")
-            return
-    
-    winner = game.winner
-    await ctx.send(f"{winner.mention} wins! 🎉 100 coins awarded!")
-
-@gomoku.error
-async def gomoku_error(ctx, error):
-    """Handle gomoku cooldown error."""
-    if isinstance(error, commands.CommandOnCooldown):
-        retry_after = error.retry_after
-        minutes, seconds = divmod(retry_after, 60)
-        cooldown_message = (
-            f"⏳ {ctx.author.mention}, the gomoku board is being prepared! "
             f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
         )
         await ctx.send(cooldown_message)
