@@ -84,14 +84,24 @@ class PVEGame:
         return f"Not enough coins to reroll. You have {self.coins} coins."
     
     def buy_character(self, char_name):
+        """Buy a character from the shop. If the character is already owned, level it up instead."""
         char = next((c for c in self.shop if c.name == char_name), None)
-        if char:
-            if self.coins >= char.Cost:
-                self.coins -= char.Cost
-                self.inventory.append(char)  # Add to inventory instead of just buying one
-                return f"You bought {char.name}! Remaining coins: {self.coins}"
-            return "Not enough coins to buy this character. You have {self.coins} coins."
-        return "Character not found in shop."
+        if not char:
+            return "Character not found in shop."
+        if self.coins < char.Cost:
+            return "Not enough coins to buy this character."
+        # Check if player already owns this character (either in inventory or as selected)
+        owned_char = next((c for c in self.inventory if c.name == char_name), None)
+        if self.player and self.player.name == char_name:
+            owned_char = self.player  # If the player is using the character, level it up instead
+        if owned_char:
+            owned_char.level_up()
+            self.coins -= char.Cost
+            return f"{owned_char.name} leveled up to Level {owned_char.level}! Remaining coins: {self.coins}"
+        # If not owned, add to inventory
+        self.inventory.append(char)
+        self.coins -= char.Cost
+        return f"You bought {char.name}! Remaining coins: {self.coins}"
 
     def choose_character(self, char_name):
         """Allows the player to choose a character from their inventory."""

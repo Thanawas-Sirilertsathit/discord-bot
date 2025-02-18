@@ -24,6 +24,7 @@ class Glacier(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -105,6 +106,7 @@ class Actress(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -188,6 +190,7 @@ class Ice_worker(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

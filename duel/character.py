@@ -9,6 +9,7 @@ class Character:
         self.DEF = DEF
         self.Cost = Cost
         self.dead = False
+        self.level = 1
 
     def restore_hp(self):
         """Restore the character's HP to full after ascending the floor."""
@@ -45,3 +46,10 @@ class Character:
 
     def view_info(self):
         return f"Abilities information"
+    
+    def level_up(self):
+        self.level += 1
+        self.maxHP += 5
+        self.ATK += 3
+        self.DEF += 2
+        self.restore_hp()

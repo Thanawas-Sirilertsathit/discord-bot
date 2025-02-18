@@ -26,6 +26,7 @@ class Huntress(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -112,6 +113,7 @@ class Florist(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -193,6 +195,7 @@ class Entomologist(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

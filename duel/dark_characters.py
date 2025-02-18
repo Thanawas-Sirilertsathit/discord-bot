@@ -24,6 +24,7 @@ class Star_collector(Character):
         self.traitreaction = Trait()
         self.dead = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -107,6 +108,7 @@ class Phantom(Character):
         self.active_working = False
         self.dodge_chance = [True, True, False]
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -199,6 +201,7 @@ class Astrologist(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

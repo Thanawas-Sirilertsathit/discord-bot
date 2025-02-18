@@ -781,15 +781,22 @@ async def choose(ctx, *character_name: str):
 
 @bot.command()
 async def inventory(ctx):
-    """Show the player character inventory."""
-    if not pve_game.inventory:
+    """Show the player character inventory, including the selected character."""
+    if not pve_game.inventory and not pve_game.player:
         await ctx.send("Your inventory is empty.")
         return
-    inventory_list = "\n".join([
-        f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Element: {char.element}, Trait: {char.trait})"
-        for char in pve_game.inventory
-    ])
-    await ctx.send(f"Your inventory:\n{inventory_list}")
+    response = "**Your Inventory:**\n"
+    if pve_game.player:
+        response += f"**Selected Character:** {pve_game.player.name} (HP: {pve_game.player.HP}, ATK: {pve_game.player.ATK}, DEF: {pve_game.player.DEF}, Element: {pve_game.player.element}, Trait: {pve_game.player.trait}, Level: {pve_game.player.level})\n\n"
+    else:
+        response += "**There is no selected character \n\n**"
+    if pve_game.inventory:
+        inventory_list = "\n".join([
+            f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Element: {char.element}, Trait: {char.trait}, Level: {char.level})"
+            for char in pve_game.inventory
+        ])
+        response += inventory_list
+    await ctx.send(response)
 
 char_list = CharacterList()
 

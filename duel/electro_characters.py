@@ -25,6 +25,7 @@ class Network_engineer(Character):
         self.traitreaction = Trait()
         self.dead = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -104,6 +105,7 @@ class Skateboarder(Character):
         self.dead = False
         self.dodge_chance = [True, False]
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -185,6 +187,7 @@ class Nurse(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

@@ -24,6 +24,7 @@ class Archer(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -108,6 +109,7 @@ class Cannon_cart(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -186,6 +188,7 @@ class Speedster(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

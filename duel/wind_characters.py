@@ -23,6 +23,7 @@ class Sakura(Character):
         self.traitreaction = Trait()
         self.dead = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -103,6 +104,7 @@ class Paladin(Character):
         self.dead = False
         self.passive_working = 3
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -183,6 +185,7 @@ class Sister(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

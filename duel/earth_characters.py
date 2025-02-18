@@ -24,6 +24,7 @@ class Clocktower(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -106,6 +107,7 @@ class Estelle_forge(Character):
         self.dead = False
         self.passive_working = False
         self.add_coin = False
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -184,6 +186,7 @@ class Tailor(Character):
         self.passive_working = 5
         self.add_coin = False
         self.active_working = 0
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -268,6 +271,7 @@ class Swordman(Character):
         self.dead = False
         self.add_coin = False
         self.active_working = True
+        self.level = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
