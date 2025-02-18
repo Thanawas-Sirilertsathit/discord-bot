@@ -739,8 +739,17 @@ async def start(ctx):
 
 @bot.command()
 async def battle(ctx):
-    """Battle against the enemy (1 enemy at a time)."""
+    """Battle against the enemy (1 enemy at a time) if all enemies in the floor are defeated then you gain 20 chips."""
     response = pve_game.battle_turn()
+    if "All enemies defeated!" in response:
+        player_id = ctx.author.id
+        data = load_player_data()
+        if can_claim_daily_reward(player_id):
+            current_chips = data[str(player_id)]['chips']
+            new_chips = current_chips + 20
+            update_player_chips(player_id, new_chips)
+            update_last_claim(player_id)
+            await ctx.send(f"{ctx.author.mention}, you've gained floor reward of 20 🪙! You now have {new_chips} 🪙.")
     await ctx.send(response)
 
 @bot.command()

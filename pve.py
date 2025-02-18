@@ -35,9 +35,11 @@ class PVEGame:
     
     def battle_turn(self):
         turn = 1
+        logging.info(f"{self.player.name} VS {self.enemies[0].name} in floor {self.floor}")
         while self.player.HP > 0 and self.enemies and turn <= 1000:
             enemy = self.enemies[0]
             self.player.take_turn(enemy)
+            logging.info(f"==================================")
             logging.info(f"After player attacks in turn {turn}")
             logging.info(f"Player: {self.player.name}, HP: {self.player.HP}, ATK: {self.player.ATK}, DEF: {self.player.DEF}")
             logging.info(f"Enemy: {enemy.name}, HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}")
@@ -55,26 +57,58 @@ class PVEGame:
             
             # Enemy's turn
             enemy.take_turn(self.player)
+            logging.info(f"==================================")
             logging.info(f"After enemy attacks in turn {turn}")
             logging.info(f"Player: {self.player.name}, HP: {self.player.HP}, ATK: {self.player.ATK}, DEF: {self.player.DEF}")
             logging.info(f"Enemy: {enemy.name}, HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}")
+            
             if self.player.isdead():
                 if not self.inventory:  # Check if the player has no more characters in inventory
-                    self.floor = 1
-                    self.coins = 15
+                    self.reset_game()
                     self.refresh_shop()
                     return "You have been defeated and have no more characters in your inventory. Resetting to Floor 1."
                 # Let the player choose a new character from the inventory
                 return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
+            
+            # Draw condition: both the player and all enemies are dead
+            if self.player.isdead() and not self.enemies:
+                if len(self.inventory) == 0:
+                    self.reset_game()
+                    return "Both you and the enemies have been defeated. It's a draw! Resetting to Floor 1."
+                elif len(self.enemies) == 1:
+                    self.floor += 1
+                    self.coins = 15
+                    self.restore_allies_hp()
+                    self.restore_enemies_hp()
+                    self.generate_enemy_lineup()
+                    self.refresh_shop()
+                    return f"The enemy was the last one standing! Moving to Floor {self.floor}."
             turn += 1
-        
+        if self.player.isdead() and self.enemies:
+            if not self.inventory:
+                self.reset_game()
+                self.refresh_shop()
+                return "You have been defeated and have no more characters in your inventory. Resetting to Floor 1."
+            return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
+        if self.player.isdead() and not self.enemies:
+            if len(self.inventory) == 0:
+                self.reset_game()
+                return "Both you and the enemies have been defeated. It's a draw! Resetting to Floor 1."
+        elif len(self.enemies) == 1:
+            self.floor += 1
+            self.coins = 15
+            self.restore_allies_hp()
+            self.restore_enemies_hp()
+            self.generate_enemy_lineup()
+            self.refresh_shop()
+            return f"The enemy was the last one standing! Moving to Floor {self.floor}."
         self.reset_game()
         return "The result turns into draw! Your progress has been reset to floor 1."
 
+
     def restore_allies_hp(self):
         """Restore HP for all characters in the player's inventory and the player."""
-        for ally in self.inventory:
-            ally.restore_hp()
+        self.player.restore_hp()
 
     def restore_enemies_hp(self):
         """Restore HP for all enemies on the floor."""
@@ -109,6 +143,7 @@ class PVEGame:
         # If not owned, add to inventory
         self.inventory.append(char)
         self.coins -= char.Cost
+        self.shop.remove(char)
         return f"You bought {char.name}! Remaining coins: {self.coins}"
 
     def choose_character(self, char_name):
