@@ -13,6 +13,7 @@ from fountain import *
 from crafting import *
 from towerdodge import *
 from gomoku import *
+from pve import *
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -725,6 +726,48 @@ async def plane_error(ctx, error):
             f"Please wait {int(minutes)} minutes and {int(seconds)} seconds before trying again."
         )
         await ctx.send(cooldown_message)
+
+pve_game = PVEGame()
+
+@bot.command()
+async def start(ctx):
+    response = pve_game.start_game()
+    await ctx.send(response)
+
+
+@bot.command()
+async def battle(ctx):
+    response = pve_game.battle_turn()
+    await ctx.send(response)
+
+@bot.command()
+async def shop(ctx):
+    shop_list = "\n".join([char.name for char in pve_game.shop])
+    await ctx.send(f"Available characters in shop:\n{shop_list}")
+
+@bot.command()
+async def reroll(ctx):
+    response, shop_list = pve_game.reroll_shop()
+    shop_text = "\n".join([char.name for char in shop_list])
+    await ctx.send(f"{response}\n{shop_text}")
+
+@bot.command()
+async def buy(ctx, *character_name: str):
+    character_name = " ".join(character_name).capitalize()
+    response = pve_game.buy_character(character_name)
+    await ctx.send(response)
+
+@bot.command()
+async def enemies(ctx):
+    enemy_list = "\n".join([enemy.name for enemy in pve_game.enemies])
+    await ctx.send(f"Upcoming enemies:\n{enemy_list}")
+
+@bot.command()
+async def choose(ctx, *character_name: str):
+    character_name = " ".join(character_name).capitalize()
+    response = pve_game.choose_character(character_name)
+    await ctx.send(response)
+
 
 @bot.event
 async def on_ready():
