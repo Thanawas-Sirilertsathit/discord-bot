@@ -35,6 +35,8 @@ class PVEGame:
     
     def battle_turn(self):
         turn = 1
+        if not self.player:
+            return "Please *choose <character_name> first to put character into battle."
         logging.info(f"{self.player.name} VS {self.enemies[0].name} in floor {self.floor}")
         while self.player.HP > 0 and self.enemies and turn <= 1000:
             enemy = self.enemies[0]
