@@ -39,3 +39,6 @@ class Character:
         damage = self.ATK
         actual_damage = opponent.take_damage(damage)
         return actual_damage
+
+    def __str__(self):
+        return f"{self.name} (HP: {self.HP}, ATK: {self.ATK}, DEF: {self.DEF}, Cost: {self.Cost})"

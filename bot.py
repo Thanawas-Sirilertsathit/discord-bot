@@ -742,14 +742,14 @@ async def battle(ctx):
 
 @bot.command()
 async def shop(ctx):
-    shop_list = "\n".join([char.name for char in pve_game.shop])
+    shop_list = "\n".join([f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})" for char in pve_game.shop])
     await ctx.send(f"Available characters in shop:\n{shop_list}")
 
 @bot.command()
 async def reroll(ctx):
     response, shop_list = pve_game.reroll_shop()
-    shop_text = "\n".join([char.name for char in shop_list])
-    await ctx.send(f"{response}\n{shop_text}")
+    shop_list = "\n".join([f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})" for char in pve_game.shop])
+    await ctx.send(f"{response}\n{shop_list}")
 
 @bot.command()
 async def buy(ctx, *character_name: str):

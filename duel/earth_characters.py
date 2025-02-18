@@ -4,9 +4,9 @@ from duel.trait import Trait
 from duel.dict_finder import dict_finder
 
 class Clocktower(Character):
-    """Contain 599-Clocktower information (dynamic and static info) and 599-Clocktower methods"""
+    """Contain Clocktower information (dynamic and static info) and Clocktower methods"""
     def __init__(self):
-        self.dictionary = dict_finder("599-Clocktower")
+        self.dictionary = dict_finder("Clocktower")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
         self.name = self.dictionary["Name"]
@@ -66,7 +66,7 @@ class Clocktower(Character):
             self.currentcooldown = 0
     
     def active_skill(self, enemy):
-        """Active skill for 599-Clocktower : Deal 30 damage to wind enemy"""
+        """Active skill for Clocktower : Deal 30 damage to wind enemy"""
         if enemy.element == self.elementreaction.wind:
             damage_element_multiplier = self.elementreaction.reaction(self.element, enemy.element)
             damage_trait_multiplier = self.traitreaction.reaction(self.trait, enemy.trait)
