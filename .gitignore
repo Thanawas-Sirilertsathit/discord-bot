@@ -164,3 +164,4 @@ decouple_config.py
 econ_data.json
 fountain.json
 backup_data.json
+battle_log.log

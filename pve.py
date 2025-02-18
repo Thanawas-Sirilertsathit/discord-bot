@@ -11,6 +11,7 @@ class PVEGame:
         self.enemies = []
         self.shop = []
         self.inventory = []
+        logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
 
     def reset_game(self):
         """Reset the game state to the initial conditions."""
@@ -33,10 +34,13 @@ class PVEGame:
         self.enemies = self.characters.get_random_enemy(self.floor)
     
     def battle_turn(self):
-        while self.player.HP > 0 and self.enemies:
+        turn = 1
+        while self.player.HP > 0 and self.enemies and turn <= 1000:
             enemy = self.enemies[0]
             self.player.take_turn(enemy)
-            
+            logging.info(f"After player attacks in turn {turn}")
+            logging.info(f"Player: {self.player.name}, HP: {self.player.HP}, ATK: {self.player.ATK}, DEF: {self.player.DEF}")
+            logging.info(f"Enemy: {enemy.name}, HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}")
             if enemy.isdead():
                 self.enemies.pop(0)
                 if not self.enemies:
@@ -51,6 +55,9 @@ class PVEGame:
             
             # Enemy's turn
             enemy.take_turn(self.player)
+            logging.info(f"After enemy attacks in turn {turn}")
+            logging.info(f"Player: {self.player.name}, HP: {self.player.HP}, ATK: {self.player.ATK}, DEF: {self.player.DEF}")
+            logging.info(f"Enemy: {enemy.name}, HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}")
             if self.player.isdead():
                 if not self.inventory:  # Check if the player has no more characters in inventory
                     self.floor = 1
@@ -59,6 +66,7 @@ class PVEGame:
                     return "You have been defeated and have no more characters in your inventory. Resetting to Floor 1."
                 # Let the player choose a new character from the inventory
                 return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
+            turn += 1
         
         self.reset_game()
         return "The result turns into draw! Your progress has been reset to floor 1."
