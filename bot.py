@@ -14,6 +14,7 @@ from crafting import *
 from towerdodge import *
 from gomoku import *
 from pve import *
+from duel.character_list import CharacterList
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -731,43 +732,82 @@ pve_game = PVEGame()
 
 @bot.command()
 async def start(ctx):
+    """Start the tower climbing PVE game."""
     response = pve_game.start_game()
     await ctx.send(response)
 
 
 @bot.command()
 async def battle(ctx):
+    """Battle against the enemy (1 enemy at a time)."""
     response = pve_game.battle_turn()
     await ctx.send(response)
 
 @bot.command()
 async def shop(ctx):
+    """Display current shop items."""
     shop_list = "\n".join([f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})" for char in pve_game.shop])
-    await ctx.send(f"Available characters in shop:\n{shop_list}")
+    await ctx.send(f"**Available characters in shop:**\n{shop_list}")
 
 @bot.command()
 async def reroll(ctx):
-    response, shop_list = pve_game.reroll_shop()
-    shop_list = "\n".join([f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})" for char in pve_game.shop])
-    await ctx.send(f"{response}\n{shop_list}")
+    """Reroll the shop using 1 coin."""
+    response = pve_game.reroll_shop()  # Only returns a string
+    shop_list = "\n".join([
+        f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})"
+        for char in pve_game.shop])
+    await ctx.send(f"**{response}**\n{shop_list}")
+
 
 @bot.command()
 async def buy(ctx, *character_name: str):
+    """Buy characters into your inventory."""
     character_name = " ".join(character_name).capitalize()
     response = pve_game.buy_character(character_name)
     await ctx.send(response)
 
 @bot.command()
 async def enemies(ctx):
+    """See enemy line up in the current floor."""
     enemy_list = "\n".join([enemy.name for enemy in pve_game.enemies])
     await ctx.send(f"Upcoming enemies:\n{enemy_list}")
 
 @bot.command()
 async def choose(ctx, *character_name: str):
+    """Choosing character to fight in the battle."""
     character_name = " ".join(character_name).capitalize()
     response = pve_game.choose_character(character_name)
     await ctx.send(response)
 
+@bot.command()
+async def inventory(ctx):
+    """Show the player character inventory."""
+    if not pve_game.inventory:
+        await ctx.send("Your inventory is empty.")
+        return
+    inventory_list = "\n".join([
+        f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Element: {char.element}, Trait: {char.trait})"
+        for char in pve_game.inventory
+    ])
+    await ctx.send(f"Your inventory:\n{inventory_list}")
+
+char_list = CharacterList()
+
+@bot.command()
+async def info(ctx, *character_name: str):
+    """Command to view character ability information in Tower climbing game."""
+    character_name = " ".join(character_name).capitalize()
+    char_list.generate_list()
+    character_classes = char_list.chars_list
+    selected_char = next((c for c in character_classes if c.name == character_name), None)
+    if selected_char:
+        character_instance = selected_char
+        character_info = character_instance.view_info()
+        await ctx.send(f"**{character_instance.name} Information:**\n{character_info}")
+    else:
+        await ctx.send("Character not found. Please check the name and try again.")
+    char_list.reset()
+    
 
 @bot.event
 async def on_ready():

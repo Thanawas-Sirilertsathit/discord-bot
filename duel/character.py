@@ -42,3 +42,6 @@ class Character:
 
     def __str__(self):
         return f"{self.name} (HP: {self.HP}, ATK: {self.ATK}, DEF: {self.DEF}, Cost: {self.Cost})"
+
+    def view_info(self):
+        return f"Abilities information"

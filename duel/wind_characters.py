@@ -79,6 +79,9 @@ class Sakura(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Paladin(Character):
     """Contain paladin information (dynamic and static info) and paladin methods"""
     def __init__(self):
@@ -156,6 +159,9 @@ class Paladin(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Sister(Character):
     """Contain sister information (dynamic and static info) and sister methods"""
     def __init__(self):
@@ -235,3 +241,7 @@ class Sister(Character):
             self.passive(enemy) # Passive skill activates first
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    

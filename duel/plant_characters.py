@@ -88,6 +88,9 @@ class Huntress(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Florist(Character):
     """Contain florist information (dynamic and static info) and florist methods"""
     def __init__(self):
@@ -166,6 +169,9 @@ class Florist(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Entomologist(Character):
     """Contain entomologist information (dynamic and static info) and entomologist methods"""
     def __init__(self):
@@ -240,3 +246,7 @@ class Entomologist(Character):
             self.passive(enemy) # Passive skill activates first
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    

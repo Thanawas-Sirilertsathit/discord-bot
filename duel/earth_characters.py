@@ -82,6 +82,9 @@ class Clocktower(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Estelle_forge(Character):
     """Contain estelle forge information (dynamic and static info) and estelle forge methods"""
     def __init__(self):
@@ -156,6 +159,9 @@ class Estelle_forge(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Tailor(Character):
     """Contain tailor information (dynamic and static info) and tailor methods"""
     def __init__(self):
@@ -237,6 +243,9 @@ class Tailor(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Swordman(Character):
     """Contain swordman information (dynamic and static info) and swordman methods"""
     def __init__(self):
@@ -330,3 +339,6 @@ class Swordman(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    

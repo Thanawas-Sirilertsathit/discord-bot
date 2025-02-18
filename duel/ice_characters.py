@@ -81,6 +81,9 @@ class Glacier(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Actress(Character):
     """Contain actress information (dynamic and static info) and actress methods"""
     def __init__(self):
@@ -161,6 +164,9 @@ class Actress(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Ice_worker(Character):
     """Contain ice worker information (dynamic and static info) and ice worker methods"""
     def __init__(self):
@@ -237,3 +243,5 @@ class Ice_worker(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"

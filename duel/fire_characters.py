@@ -84,6 +84,9 @@ class Archer(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Cannon_cart(Character):
     """Contain cannon cart information (dynamic and static info) and cannon cart methods"""
     def __init__(self):
@@ -159,6 +162,9 @@ class Cannon_cart(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Speedster(Character):
     """Contain speedster information (dynamic and static info) and speedster methods"""
     def __init__(self):
@@ -233,3 +239,7 @@ class Speedster(Character):
             self.passive(enemy) # Passive skill activates first
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    

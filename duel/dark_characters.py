@@ -82,6 +82,9 @@ class Star_collector(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+
 class Phantom(Character):
     """Contain phantom information (dynamic and static info) and phantom methods"""
     def __init__(self):
@@ -171,6 +174,9 @@ class Phantom(Character):
             self.passive(enemy) # Passive works first
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+    
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
 
 class Astrologist(Character):
     """Contain astrologist information (dynamic and static info) and astrologist methods"""
@@ -249,3 +255,6 @@ class Astrologist(Character):
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.passive(enemy) # Passive skill activates after attack enemy too
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+    
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"

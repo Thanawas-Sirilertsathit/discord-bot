@@ -80,6 +80,9 @@ class Network_engineer(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Skateboarder(Character):
     """Contain skateboarder information (dynamic and static info) and skateboarder methods"""
     def __init__(self):
@@ -158,6 +161,9 @@ class Skateboarder(Character):
             self.deal_damage(enemy) # Normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
 
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    
 class Nurse(Character):
     """Contain nurse information (dynamic and static info) and nurse methods"""
     def __init__(self):
@@ -242,3 +248,7 @@ class Nurse(Character):
             self.passive(enemy) # Passive skill activates first
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
+
+    def view_info(self):
+        return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
+    

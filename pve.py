@@ -80,8 +80,8 @@ class PVEGame:
         if self.coins >= 1:
             self.coins -= 1
             self.refresh_shop()
-            return "Shop rerolled! Here are the new characters:", self.shop
-        return "Not enough coins to reroll."
+            return f"Shop rerolled! Here are the new characters: {', '.join(c.name for c in self.shop)}. Remaining coins: {self.coins}"
+        return f"Not enough coins to reroll. You have {self.coins} coins."
     
     def buy_character(self, char_name):
         char = next((c for c in self.shop if c.name == char_name), None)
@@ -90,14 +90,14 @@ class PVEGame:
                 self.coins -= char.Cost
                 self.inventory.append(char)  # Add to inventory instead of just buying one
                 return f"You bought {char.name}! Remaining coins: {self.coins}"
-            return "Not enough coins to buy this character."
+            return "Not enough coins to buy this character. You have {self.coins} coins."
         return "Character not found in shop."
 
     def choose_character(self, char_name):
         """Allows the player to choose a character from their inventory."""
         char = next((c for c in self.inventory if c.name == char_name), None)
         if char:
-            self.player = char  # Set the selected character as the player's active character
+            self.player = char
             self.inventory.remove(char)  # Remove from inventory
             return f"You selected {char.name}!"
         return "Character not found in inventory."
