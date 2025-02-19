@@ -733,76 +733,117 @@ pve_game = PVEGame()
 @bot.command()
 async def start(ctx):
     """Start the tower climbing PVE game."""
-    response = pve_game.start_game()
+    player_id = ctx.author.id
+    response = pve_game.start_game(player_id)
     await ctx.send(response)
-
 
 @bot.command()
 async def battle(ctx):
-    """Battle against the enemy (1 enemy at a time) if all enemies in the floor are defeated then you gain 20 chips."""
-    response = pve_game.battle_turn()
+    """Battle against the enemy (1 enemy at a time). If all enemies are defeated, gain 20 chips."""
+    player_id = ctx.author.id
+    response = pve_game.battle_turn(player_id)
     if "All enemies defeated!" in response:
-        player_id = ctx.author.id
         data = load_player_data()
-        if can_claim_daily_reward(player_id):
-            current_chips = data[str(player_id)]['chips']
-            new_chips = current_chips + 20
-            update_player_chips(player_id, new_chips)
-            update_last_claim(player_id)
-            await ctx.send(f"{ctx.author.mention}, you've gained floor reward of 20 🪙! You now have {new_chips} 🪙.")
+        current_chips = data.get(str(player_id), {}).get('chips', 0)
+        new_chips = current_chips + 20
+        update_player_chips(player_id, new_chips)
+        update_last_claim(player_id)
+        await ctx.send(f"{ctx.author.mention}, you've gained a floor reward of 20 🪙! You now have {new_chips} 🪙.")
     await ctx.send(response)
+
 
 @bot.command()
 async def shop(ctx):
     """Display current shop items."""
-    shop_list = "\n".join([f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})" for char in pve_game.shop])
+    player_id = ctx.author.id
+    if player_id not in pve_game.players:
+        await ctx.send("You haven't started a game yet! Use `*start` first.")
+        return
+    shop = pve_game.players[player_id]['shop']
+    if not shop:
+        await ctx.send("The shop is empty. Try rerolling.")
+        return
+    shop_list = "\n".join([
+        f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})"
+        for char in shop
+    ])
     await ctx.send(f"**Available characters in shop:**\n{shop_list}")
+
 
 @bot.command()
 async def reroll(ctx):
     """Reroll the shop using 1 coin."""
-    response = pve_game.reroll_shop()  # Only returns a string
+    player_id = ctx.author.id
+    response = pve_game.reroll_shop(player_id)
+    shop = pve_game.players[player_id]['shop']
     shop_list = "\n".join([
         f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Cost: {char.Cost}, Element: {char.element}, Trait: {char.trait})"
-        for char in pve_game.shop])
+        for char in shop
+    ])
     await ctx.send(f"**{response}**\n{shop_list}")
 
 
 @bot.command()
 async def buy(ctx, *character_name: str):
     """Buy characters into your inventory."""
+    player_id = ctx.author.id
+    if not character_name:
+        await ctx.send("Please specify a character name.")
+        return
     character_name = " ".join(character_name).capitalize()
-    response = pve_game.buy_character(character_name)
+    response = pve_game.buy_character(player_id, character_name)
     await ctx.send(response)
+
 
 @bot.command()
 async def enemies(ctx):
-    """See enemy line up in the current floor."""
-    enemy_list = "\n".join([enemy.name for enemy in pve_game.enemies])
-    await ctx.send(f"Upcoming enemies:\n{enemy_list}")
+    """See enemy lineup in the current floor."""
+    player_id = ctx.author.id
+    if player_id not in pve_game.players:
+        await ctx.send("You haven't started a game yet! Use `*start` first.")
+        return
+    enemies = pve_game.players[player_id]['enemies']
+    if not enemies:
+        await ctx.send("There are no enemies currently.")
+        return
+    enemy_list = "\n".join([f"{enemy.name} (HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}, Cost: {enemy.Cost}, Element: {enemy.element}, Trait: {enemy.trait})" for enemy in enemies])
+    await ctx.send(f"**Upcoming enemies:**\n{enemy_list}")
+
 
 @bot.command()
 async def choose(ctx, *character_name: str):
-    """Choosing character to fight in the battle."""
+    """Choose a character to fight in battle."""
+    player_id = ctx.author.id
+    if not character_name:
+        await ctx.send("Please specify a character name.")
+        return
     character_name = " ".join(character_name).capitalize()
-    response = pve_game.choose_character(character_name)
+    response = pve_game.choose_character(player_id, character_name)
     await ctx.send(response)
+
 
 @bot.command()
 async def inventory(ctx):
     """Show the player character inventory, including the selected character."""
-    if not pve_game.inventory and not pve_game.player:
+    player_id = ctx.author.id
+    if player_id not in pve_game.players:
+        await ctx.send("You haven't started a game yet! Use `*start` first.")
+        return
+    player_data = pve_game.players[player_id]
+    inventory = player_data['inventory']
+    selected_character = player_data['player']
+    if not inventory and not selected_character:
         await ctx.send("Your inventory is empty.")
         return
     response = "**Your Inventory:**\n"
-    if pve_game.player:
-        response += f"**Selected Character:** {pve_game.player.name} (HP: {pve_game.player.HP}, ATK: {pve_game.player.ATK}, DEF: {pve_game.player.DEF}, Element: {pve_game.player.element}, Trait: {pve_game.player.trait}, Level: {pve_game.player.level})\n\n"
+    if selected_character:
+        response += f"**Selected Character:** {selected_character.name} (HP: {selected_character.HP}, ATK: {selected_character.ATK}, DEF: {selected_character.DEF}, Element: {selected_character.element}, Trait: {selected_character.trait}, Level: {selected_character.level})\n\n"
     else:
-        response += "**There is no selected character \n\n**"
-    if pve_game.inventory:
+        response += "**There is no selected character**\n\n"
+    if inventory:
         inventory_list = "\n".join([
             f"{char.name} (HP: {char.HP}, ATK: {char.ATK}, DEF: {char.DEF}, Element: {char.element}, Trait: {char.trait}, Level: {char.level})"
-            for char in pve_game.inventory
+            for char in inventory
         ])
         response += inventory_list
     await ctx.send(response)
