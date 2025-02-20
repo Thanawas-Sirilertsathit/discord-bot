@@ -9,6 +9,7 @@ class ElementReaction:
         self.dark = "Dark"
         self.wind = "Wind"
         self.ice = "Ice"
+        self.quantum = "Quantum"
         self.EARTH = Earth()
         self.WATER = Water()
         self.ELECTRO = Electro()
@@ -17,6 +18,7 @@ class ElementReaction:
         self.DARK = Dark()
         self.WIND = Wind()
         self.ICE = Ice()
+        self.QUANTUM = Quantum()
     
     def reaction(self, attacker, receiver):
         """ Reaction damage multiplier calculator
@@ -40,6 +42,8 @@ class ElementReaction:
             return self.DARK.reaction(receiver)
         elif attacker == self.wind:
             return self.WIND.reaction(receiver)
+        elif attacker == self.quantum:
+            return self.QUANTUM.reaction(receiver)
         else:
             raise ValueError(f"There is no element {attacker}")
         
@@ -54,7 +58,8 @@ class Element:
         self.dark = "Dark"
         self.wind = "Wind"
         self.ice = "Ice"
-        self.element_list = ["Earth", "Water", "Electro", "Fire", "Plant", "Dark", "Wind", "Ice"]
+        self.quantum = "Quantum"
+        self.element_list = ["Earth", "Water", "Electro", "Fire", "Plant", "Dark", "Wind", "Ice", "Quantum"]
     def reaction(self):
         pass
 
@@ -187,5 +192,19 @@ class Ice(Element):
             return 2
         elif receiver in self.element_list:
             return 1
+        else:
+            raise ValueError(f"There is no element {receiver}")
+
+class Quantum(Element):
+    """Contain Quantum elemental reactions"""
+    def __init__(self):
+        super().__init__()
+    
+    def reaction(self, receiver):
+        """Output the damage multiplier of the reaction"""
+        if receiver == self.quantum: # No reaction
+            return 1
+        elif receiver in self.element_list: # Quantum power
+            return 2
         else:
             raise ValueError(f"There is no element {receiver}")

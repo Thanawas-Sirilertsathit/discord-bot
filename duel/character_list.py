@@ -6,6 +6,7 @@ from duel.ice_characters import Actress, Glacier, Ice_worker
 from duel.plant_characters import Entomologist, Florist, Huntress
 from duel.water_characters import Arcmage, Barista, Painter, Lawyer
 from duel.wind_characters import Sakura, Sister, Paladin
+from duel.quantum_characters import Gatekeeper
 import random
 
 class CharacterList:
@@ -38,6 +39,7 @@ class CharacterList:
         self.sakura = Sakura()
         self.sister = Sister()
         self.paladin = Paladin()
+        self.gatekeeper = Gatekeeper()
         self.chars_list = []
 
     def reset(self):
@@ -68,6 +70,7 @@ class CharacterList:
         self.sakura = Sakura()
         self.sister = Sister()
         self.paladin = Paladin()
+        self.gatekeeper = Gatekeeper()
         self.chars_list = []
 
     def generate_list(self):
@@ -99,6 +102,7 @@ class CharacterList:
         self.chars_list.append(self.sakura)
         self.chars_list.append(self.sister)
         self.chars_list.append(self.paladin)
+        self.chars_list.append(self.gatekeeper)
 
     def get_list(self):
         """Return a list contains all characters"""
@@ -115,6 +119,6 @@ class CharacterList:
         """Generate a list of enemies based on the floor level"""
         enemies = random.sample(self.chars_list, 3)
         for enemy in enemies:
-            enemy.HP += floor * 5
+            enemy.HP += floor * 3
             enemy.ATK += floor
         return enemies

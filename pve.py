@@ -1,6 +1,7 @@
 from duel.character_list import CharacterList
 import random
 import logging
+import copy
 
 class PVEGame:
     def __init__(self):
@@ -28,11 +29,14 @@ class PVEGame:
         return f"You will fight the following enemies on Floor 1: {', '.join([enemy.name for enemy in self.players[player_id]['enemies']])}"
 
     def generate_enemy_lineup(self, player_id):
-        self.players[player_id]['enemies'] = self.characters.get_random_enemy(self.players[player_id]['floor'])
+        self.players[player_id]['enemies'] = [copy.deepcopy(enemy) for enemy in self.characters.get_random_enemy(self.players[player_id]['floor'])]
 
     def battle_turn(self, player_id):
         player_data = self.players[player_id]
         turn = 1
+        if player_data['player'].add_coin:
+            player_data['coins'] += 1  # A player gain coin
+        player_data['player'].add_coin = False
         if not player_data['player']:
             return "Please *choose <character_name> first to put a character into battle."
         if player_data['player'].isdead():
@@ -70,23 +74,23 @@ class PVEGame:
                     return "You have been defeated and have no more characters in your inventory. Resetting to Floor 1."
                 return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
             turn += 1
-        
         # Turn limit reached - force both player and enemy to 0 HP
         player_data['player'].HP = 0
         player_data['enemies'][0].HP = 0
-        
         # Check if the player has more characters in inventory
         if player_data['inventory']:
             return "The battle reached the turn limit. Your character has fallen. Choose a new character from your inventory."
-        
-        # If no more characters, reset the game
         self.reset_game(player_id)
         return "The battle reached the turn limit. No characters left. Resetting to Floor 1."
 
 
     def restore_allies_hp(self, player_id):
         """Restore HP for all characters in the player's inventory and the player."""
-        self.players[player_id]['player'].restore_hp()
+        player_data = self.players[player_id]
+        if player_data['player']:
+            player_data['player'].restore_hp()
+        for char in player_data['inventory']:
+            char.restore_hp()
 
     def restore_enemies_hp(self, player_id):
         """Restore HP for all enemies on the floor."""
@@ -125,9 +129,15 @@ class PVEGame:
         return f"You bought {char.name}! Remaining coins: {player_data['coins']}"
 
     def choose_character(self, player_id, char_name):
-        char = next((c for c in self.players[player_id]['inventory'] if c.name == char_name), None)
-        if char:
-            self.players[player_id]['player'] = char
-            self.players[player_id]['inventory'].remove(char)
-            return f"You selected {char.name}!"
-        return "Character not found in inventory."
+        player_data = self.players[player_id]
+        new_char = next((c for c in player_data['inventory'] if c.name == char_name), None)
+        if not new_char:
+            return "Character not found in inventory."
+        if player_data['player']:
+            if not player_data['player'].isdead():
+                player_data['inventory'].append(player_data['player'])
+            player_data['player'] = None  # Reset current character
+        player_data['inventory'].remove(new_char)
+        player_data['player'] = new_char
+
+        return f"You selected {new_char.name}!"

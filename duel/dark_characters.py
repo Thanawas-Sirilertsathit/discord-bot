@@ -50,10 +50,10 @@ class Star_collector(Character):
 
     def passive(self, enemy):
         """Passive skill : Part of collection"""
-        self.ATK += 5
-        self.maxHP += 5
-        self.HP += 5
-        self.DEF += 5
+        self.ATK += 2
+        self.maxHP += 2
+        self.HP += 2
+        self.DEF += 2
 
     def die(self, enemy):
         """Method for this character when it dies"""
@@ -72,8 +72,8 @@ class Star_collector(Character):
     
     def active_skill(self, enemy):
         """Active skill for star collector : Grant +5 max HP"""
-        self.maxHP += 5
-        self.HP += 5
+        self.maxHP += 2
+        self.HP += 2
 
     def take_turn(self, enemy):
         """Method for taking turn : Combine 2 methods"""
