@@ -237,6 +237,7 @@ class Lawyer(Character):
     def active_skill(self, enemy):
         """Active skill for lawyer : transfer enemy ATK to lawyer HP"""
         self.HP += enemy.ATK
+        self.maxHP += enemy.ATK
         enemy.ATK = 1
 
 
