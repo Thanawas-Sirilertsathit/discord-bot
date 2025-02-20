@@ -149,8 +149,8 @@ class Estelle_forge(Character):
             self.currentcooldown = 0
     
     def active_skill(self, enemy):
-        """Active skill for estelle forge : Gain permanent +3 DEF"""
-        self.DEF += 3
+        """Active skill for estelle forge : Gain permanent +5 DEF"""
+        self.DEF += 5
 
     def take_turn(self, enemy):
         """Method for taking turn : Combine 3 methods"""
