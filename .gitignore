@@ -165,3 +165,7 @@ econ_data.json
 fountain.json
 backup_data.json
 battle_log.log
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+leaderboard.json
