@@ -131,7 +131,7 @@ class Estelle_forge(Character):
 
     def passive(self, enemy):
         """Passive skill : Swordsmith"""
-        self.ATK += 2
+        self.ATK += 1
 
     def die(self, enemy):
         """Method for this character when it dies"""
@@ -149,8 +149,8 @@ class Estelle_forge(Character):
             self.currentcooldown = 0
     
     def active_skill(self, enemy):
-        """Active skill for estelle forge : Gain permanent +5 DEF"""
-        self.DEF += 5
+        """Active skill for estelle forge : Gain permanent +3 DEF"""
+        self.DEF += 3
 
     def take_turn(self, enemy):
         """Method for taking turn : Combine 3 methods"""

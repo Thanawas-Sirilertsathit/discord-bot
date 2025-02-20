@@ -2,12 +2,34 @@ from duel.character_list import CharacterList
 import random
 import logging
 import copy
+import json
+import os
 
 class PVEGame:
     def __init__(self):
         self.characters = CharacterList()
-        self.players = {}  # Store individual player states
+        self.players = {}  # Store individual player stats
+        self.leaderboard_file = "leaderboard.json"
+        self.leaderboard = self.load_leaderboard()
         logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
+
+    def load_leaderboard(self):
+        """Load the leaderboard from a JSON file."""
+        if os.path.exists(self.leaderboard_file):
+            with open(self.leaderboard_file, "r") as file:
+                return json.load(file)
+        return {}
+
+    def save_leaderboard(self):
+        """Save the leaderboard to a JSON file."""
+        with open(self.leaderboard_file, "w") as file:
+            json.dump(self.leaderboard, file, indent=4)
+
+    def update_leaderboard(self, player_id, floor):
+        """Update the player's highest floor and save to file."""
+        if player_id not in self.leaderboard or floor > self.leaderboard[player_id]:
+            self.leaderboard[player_id] = floor
+            self.save_leaderboard()
 
     def reset_game(self, player_id):
         """Reset the game state for a specific player."""
@@ -54,6 +76,7 @@ class PVEGame:
                 player_data['enemies'].pop(0)
                 if not player_data['enemies']:
                     player_data['floor'] += 1
+                    self.update_leaderboard(player_id, player_data['floor'])
                     player_data['coins'] = 15
                     self.restore_allies_hp(player_id)
                     self.restore_enemies_hp(player_id)
@@ -141,3 +164,12 @@ class PVEGame:
         player_data['player'] = new_char
 
         return f"You selected {new_char.name}!"
+
+    def view_leaderboard(self):
+        """Return a sorted leaderboard string."""
+        if not self.leaderboard:
+            return "No leaderboard data available."
+        
+        sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
+        leaderboard_text = "\n".join([f"<@{player_id}>: Floor {floor}" for player_id, floor in sorted_leaderboard[:10]])
+        return f"🏆 **Leaderboard - Highest Floors** 🏆\n{leaderboard_text}"

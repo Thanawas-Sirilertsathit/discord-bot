@@ -738,6 +738,12 @@ async def start(ctx):
     await ctx.send(response)
 
 @bot.command()
+async def top_floor(ctx):
+    """Show the leaderboard with the highest floors reached."""
+    leaderboard_text = pve_game.view_leaderboard()
+    await ctx.send(leaderboard_text)
+
+@bot.command()
 async def battle(ctx):
     """Battle against the enemy (1 enemy at a time). If all enemies are defeated, gain 20 chips."""
     player_id = ctx.author.id
@@ -847,6 +853,16 @@ async def inventory(ctx):
         ])
         response += inventory_list
     await ctx.send(response)
+
+@bot.command()
+async def coins(ctx):
+    """Check the player's current coin in game."""
+    player_id = ctx.author.id
+    if player_id not in pve_game.players:
+        await ctx.send("You are not in the game. Use `*start` to begin.")
+        return
+    current_coins = pve_game.players[player_id]['coins']
+    await ctx.send(f"**{ctx.author.display_name}, you currently have {current_coins} coins.**")
 
 char_list = CharacterList()
 

@@ -49,7 +49,7 @@ class Character:
     
     def level_up(self):
         self.level += 1
-        self.maxHP += 5
-        self.ATK += 3
+        self.maxHP += 10
+        self.ATK += 5
         self.DEF += 2
         self.restore_hp()
