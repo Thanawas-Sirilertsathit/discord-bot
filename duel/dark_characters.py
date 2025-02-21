@@ -53,7 +53,6 @@ class Star_collector(Character):
         self.ATK += 2
         self.maxHP += 2
         self.HP += 2
-        self.DEF += 2
 
     def die(self, enemy):
         """Method for this character when it dies"""

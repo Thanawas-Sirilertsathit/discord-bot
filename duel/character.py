@@ -51,5 +51,5 @@ class Character:
         self.level += 1
         self.maxHP += 10
         self.ATK += 5
-        self.DEF += 2
+        self.DEF += 1
         self.restore_hp()

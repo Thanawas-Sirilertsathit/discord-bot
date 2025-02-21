@@ -50,6 +50,8 @@ class Clocktower(Character):
         """Passive skill : Time flies"""
         if self.ATK < 12:
             self.ATK += 1
+        if self.DEF < 12:
+            self.DEF += 1
 
     def die(self, enemy):
         """Method for this character when it dies"""
