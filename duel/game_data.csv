@@ -25,4 +25,4 @@ Tailor,4,11,3,3,None,Earth,Metallic thread,Gain +1 DEF each turn maximum 5 stack
 Astrologist,5,12,1,5,Siege,Dark,Lunar eclipse,Instantly kill enemy that has 2 or lower HP,Constellation power,2,+5 ATK for 1 turn
 Phantom,5,13,2,5,None,Dark,Power up,"If enemy is either Fire, Water, Electro or Ice, gain +5 ATK until enemy is not in this list",Illusion master,4,Has 2/3 chance to dodge the enemy attack for 1 turn
 Star collector,1,7,2,4,None,Dark,Part of collection,"After killing enemy, gain +2 HP and ATK permanently",Star shield,3,Gain additional 2 max HP
-Gatekeeper,2,10,2,4,None,Quantum,Quantum bridge,Gain +1 HP each turn,Dimension gate open,3,Gain +5 ATK permanently
+Gatekeeper,2,10,2,4,None,Quantum,Quantum bridge,Gain +1 HP each turn,Dimension gate open,3,Gain +3 ATK permanently

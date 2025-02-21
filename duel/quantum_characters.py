@@ -67,8 +67,8 @@ class Gatekeeper(Character):
             self.currentcooldown = 0
     
     def active_skill(self, enemy):
-        """Active skill for gatekeeper : Grant +5 ATK"""
-        self.ATK += 5
+        """Active skill for gatekeeper : Grant +3 ATK"""
+        self.ATK += 3
 
     def take_turn(self, enemy):
         """Method for taking turn : Combine 2 methods"""
