@@ -48,8 +48,8 @@ class Gatekeeper(Character):
 
     def passive(self, enemy):
         """Passive skill : Quantum bridge"""
-        self.maxHP += 3
-        self.HP += 3
+        self.maxHP += 1
+        self.HP += 1
 
     def die(self, enemy):
         """Method for this character when it dies"""
