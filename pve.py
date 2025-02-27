@@ -22,11 +22,13 @@ class PVEGame:
 
     def save_leaderboard(self):
         """Save the leaderboard to a JSON file."""
+        unique_leaderboard = {str(k): v for k, v in self.leaderboard.items()}
         with open(self.leaderboard_file, "w") as file:
             json.dump(self.leaderboard, file, indent=4)
 
     def update_leaderboard(self, player_id, floor):
         """Update the player's highest floor and save to file."""
+        player_id = str(player_id)
         if player_id not in self.leaderboard or floor > self.leaderboard[player_id]:
             self.leaderboard[player_id] = floor
             self.save_leaderboard()
@@ -62,6 +64,9 @@ class PVEGame:
         if not player_data['player']:
             return "Please *choose <character_name> first to put a character into battle."
         if player_data['player'].isdead():
+            if player_data['player'].name == "Mechanic":
+                player_data.receive_damage(1, player_data['enemies'][0])
+                return "Mechanic is dead. Your character becomes Turret."
             return "Your selected character is dead. Please select another character."
         logging.info(f"{player_data['player'].name} VS {player_data['enemies'][0].name} in floor {player_data['floor']}")
         while player_data['player'].HP > 0 and player_data['enemies'] and turn <= 1000:
