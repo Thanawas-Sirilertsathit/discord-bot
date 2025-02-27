@@ -12,6 +12,7 @@ Ice worker,2,7,2,4,Siege,Ice,Cold career,Gain additional 1 max HP every turn,Gig
 Nurse,5,10,1,4,None,Electro,Anesthetic injection,Enemy gets -5 ATK when this character joins the arena,Bloody knife,2,Heal herself equals to damage that damage you deal to enemy that pass the DEF
 Network engineer,6,15,1,7,Siege,Electro,Microwave,Attack decrease enemy DEF  by 1,Better network,3,Gain 1 coin
 Skateboarder,3,7,1,4,None,Electro,High agility,Has 50% chance to dodge enemy attack,Speedrun,2,Gain 2 x ATK for 1 turn
+Mechanic,4,20,2,5,None,Electro,Turret construction,Summon turret on death with number of turn this survive as based stats and remain the active skill,Electro shock,3,Enemy gets -2 ATK
 Sakura,6,20,3,7,None,Wind,Capture,Change element to enemy element when kill enemy,Elemental mastery,3,Gain permanent +2 ATK and +4 max HP
 Paladin,4,12,3,5,None,Wind,Holy blade,"When enter the arena, gain +3 ATK boost for 3 turns",Storm shield,3,Gain +10 DEF boost for 1 turn
 Sister,5,15,1,3,Siege,Wind,Regeneration,Heal 2 HP every turn,Blessing,2,+10 ATK for 1 turn
