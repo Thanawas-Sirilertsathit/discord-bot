@@ -309,7 +309,8 @@ class Mechanic(Character):
 
     def passive(self, enemy):
         """Passive skill : Electro turret"""
-        self.turn += 1
+        if self.turn <= 100:
+            self.turn += 1
 
     def die(self, enemy):
         """Method for this character when it dies"""
