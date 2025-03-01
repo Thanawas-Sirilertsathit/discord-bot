@@ -1,4 +1,4 @@
-from duel.dark_characters import Astrologist, Phantom, Star_collector
+from duel.dark_characters import Astrologist, Phantom, Star_collector, Clockworker
 from duel.earth_characters import Clocktower, Swordman, Estelle_forge, Tailor
 from duel.electro_characters import Network_engineer, Nurse, Skateboarder, Mechanic
 from duel.fire_characters import Archer, Speedster, Cannon_cart
@@ -42,6 +42,7 @@ class CharacterList:
         self.gatekeeper = Gatekeeper()
         self.mechanic = Mechanic()
         self.toykeeper = Toykeeper()
+        self.clocktower = Clockworker()
         self.chars_list = []
 
     def reset(self):
@@ -75,6 +76,7 @@ class CharacterList:
         self.gatekeeper = Gatekeeper()
         self.mechanic = Mechanic()
         self.toykeeper = Toykeeper()
+        self.clocktower = Clockworker()
         self.chars_list = []
 
     def generate_list(self):
@@ -109,6 +111,7 @@ class CharacterList:
         self.chars_list.append(self.gatekeeper)
         self.chars_list.append(self.mechanic)
         self.chars_list.append(self.toykeeper)
+        self.chars_list.append(self.clocktower)
 
     def get_list(self):
         """Return a list contains all characters"""

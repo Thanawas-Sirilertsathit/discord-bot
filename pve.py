@@ -12,7 +12,7 @@ class PVEGame:
         self.players = {}  # Store individual player stats
         self.leaderboard_file = "leaderboard.json"
         self.leaderboard = self.load_leaderboard()
-        self.revivable = ["Mechanic", "Furby", "Toykeeper"]
+        self.dead_buff = {"Clockworker": [10, 5, 0], "AnotherCharacter": [15, 7, 3]}
         logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
 
     def load_leaderboard(self):
@@ -164,6 +164,12 @@ class PVEGame:
         if player_data['player']:
             if not player_data['player'].isdead():
                 player_data['inventory'].append(player_data['player'])
+            elif player_data['player'].isdead() and player_data['player'].name in self.dead_buff:
+                buff = self.dead_buff[player_data['player'].name]
+                new_char.maxHP += buff[0]
+                new_char.HP += buff[0]
+                new_char.ATK += buff[1]
+                new_char.DEF += buff[2]
             player_data['player'] = None  # Reset current character
         player_data['inventory'].remove(new_char)
         player_data['player'] = new_char
