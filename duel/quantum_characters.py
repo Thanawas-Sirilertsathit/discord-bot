@@ -134,8 +134,8 @@ class Toykeeper(Character):
         """Method for this character when it dies"""
         if self.revive < 3:
             self.name = "Furby"
-            self.maxHP = 30
-            self.ATK = 10
+            self.maxHP = 30*self.level
+            self.ATK = 10 + (5*(self.level-1))
             self.DEF = 5
             self.trait = "Siege"
             self.restore_hp()
