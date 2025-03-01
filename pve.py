@@ -12,7 +12,7 @@ class PVEGame:
         self.players = {}  # Store individual player stats
         self.leaderboard_file = "leaderboard.json"
         self.leaderboard = self.load_leaderboard()
-        self.dead_buff = {"Clockworker": [10, 5, 0], "AnotherCharacter": [15, 7, 3]}
+        self.dead_buff = {"Clockworker": [10, 5, 0, 0], "Socerer": [0, 0, 0, 1]}
         logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
 
     def load_leaderboard(self):
@@ -170,6 +170,8 @@ class PVEGame:
                 new_char.HP += buff[0]
                 new_char.ATK += buff[1]
                 new_char.DEF += buff[2]
+                for i in range(buff[3]):
+                    new_char.level_up()
             player_data['player'] = None  # Reset current character
         player_data['inventory'].remove(new_char)
         player_data['player'] = new_char

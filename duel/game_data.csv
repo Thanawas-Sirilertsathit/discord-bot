@@ -2,6 +2,7 @@ Name,Cost,HP,DEF,ATK,Trait,Element,Passive skill name,Passive skill description,
 Archer,2,10,0,4,None,Fire,Pierce arrow,Attack ignore 1 DEF of enemy,Flame arrow,3,+3 ATK for 1 turn
 Cannon cart,6,15,3,6,Siege,Fire,Shattering shell,Attack turns enemy DEF to 0,Overload,2,Deal additional 6 damage to Electro character unit when attack
 Speedster,1,10,1,1,None,Fire,Insane fire,Deal additional 5 damage to Ice character when attack,Furious flame,3,+3 ATK for 1 turn
+Socerer,3,10,2,2,None,Fire,Enlightenment,Give one level to next selected character after death,Intense magic,3,Change enemy DEF to 0
 Arcmage,3,12,1,2,None,Water,Absorbtion,Gain +1 ATK each turn maximum 3 stacks,Bubble shield,3,Gain additional 5 max HP
 Barista,3,12,1,4,None,Water,Hot coffee,Deal additional 4 damage to Ice character when attack,Secret recipe,3,Heal herself for 5 HP
 Lawyer,7,25,3,3,None,Water,Peace representative,Transfer enemy 1 ATK to this character 1 ATK every turn,Emergency law,4,Transfer all of enemy ATK to this character HP and enemy still has 1 ATK
@@ -26,6 +27,6 @@ Tailor,4,15,3,3,None,Earth,Metallic thread,Gain +1 DEF each turn maximum 5 stack
 Astrologist,5,12,1,5,Siege,Dark,Lunar eclipse,Instantly kill enemy that has 2 or lower HP,Constellation power,2,+5 ATK for 1 turn
 Phantom,4,13,2,5,None,Dark,Power up,"If enemy is either Fire, Water, Electro or Ice, gain +5 ATK until enemy is not in this list",Illusion master,4,Has 2/3 chance to dodge the enemy attack for 1 turn
 Star collector,1,7,2,4,None,Dark,Part of collection,"After killing enemy, gain +2 HP and ATK permanently",Star shield,3,Gain additional 2 max HP
-Clockworker,1,7,2,2,None,Dark,Mechanical winding,Buff next selected character +10HP and +5ATK,Daynight cycle,1,Change its own element between Fire and Dark
+Clockworker,2,7,2,2,None,Dark,Mechanical winding,Buff next selected character +10HP and +5ATK,Daynight cycle,1,Change its own element between Fire and Dark
 Gatekeeper,2,10,2,4,None,Quantum,Quantum bridge,Gain +1 HP each turn,Dimension gate open,3,Gain +3 ATK permanently
 Toykeeper,5,12,4,4,None,Quantum,Furby friends,Resurrect itself as Furby 3 times with 30 HP x level and siege,Unstable energy,3,Remove 10 max HP from enemy when being Furby
