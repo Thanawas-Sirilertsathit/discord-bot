@@ -4,6 +4,7 @@ import logging
 import copy
 import json
 import os
+from duel.quantum_characters import Toykeeper
 
 class PVEGame:
     def __init__(self):
@@ -11,6 +12,7 @@ class PVEGame:
         self.players = {}  # Store individual player stats
         self.leaderboard_file = "leaderboard.json"
         self.leaderboard = self.load_leaderboard()
+        self.revivable = ["Mechanic", "Furby", "Toykeeper"]
         logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
 
     def load_leaderboard(self):
@@ -64,9 +66,6 @@ class PVEGame:
         if not player_data['player']:
             return "Please *choose <character_name> first to put a character into battle."
         if player_data['player'].isdead():
-            if player_data['player'].name == "Mechanic":
-                player_data.receive_damage(1, player_data['enemies'][0])
-                return "Mechanic is dead. Your character becomes Turret."
             return "Your selected character is dead. Please select another character."
         logging.info(f"{player_data['player'].name} VS {player_data['enemies'][0].name} in floor {player_data['floor']}")
         while player_data['player'].HP > 0 and player_data['enemies'] and turn <= 1000:
@@ -102,9 +101,10 @@ class PVEGame:
                     return "You have been defeated and have no more characters in your inventory. Resetting to Floor 1."
                 return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
             turn += 1
-        # Turn limit reached - force both player and enemy to 0 HP
-        player_data['player'].HP = 0
-        player_data['enemies'][0].HP = 0
+        # Turn limit reached - force both player and enemy to die
+        player_data['player'].die()
+        player_data['enemies'][0].die()
+        player_data['enemies'].pop(0)
         # Check if the player has more characters in inventory
         if player_data['inventory']:
             return "The battle reached the turn limit. Your character has fallen. Choose a new character from your inventory."

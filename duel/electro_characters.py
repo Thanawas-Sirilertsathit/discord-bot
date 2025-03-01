@@ -287,14 +287,6 @@ class Mechanic(Character):
         else:
             self.HP = self.HP - dmg_taken
         if self.HP <= 0:
-            if self.name == "Mechanic":
-                self.name = "Turret"
-                self.trait = "Building"
-                self.maxHP = 10*self.turn
-                self.ATK = self.turn
-                self.DEF = self.turn
-                self.restore_hp()
-                return
             self.die(enemy)
 
     def deal_damage(self, enemy):
@@ -314,6 +306,14 @@ class Mechanic(Character):
 
     def die(self, enemy):
         """Method for this character when it dies"""
+        if self.name == "Mechanic":
+            self.name = "Turret"
+            self.trait = "Building"
+            self.maxHP = 10*self.turn
+            self.ATK = self.turn
+            self.DEF = self.turn
+            self.restore_hp()
+            return
         self.dead = True
 
     def isdead(self):
@@ -342,14 +342,6 @@ class Mechanic(Character):
             self.passive(enemy) # Passive skill activates first
             self.deal_damage(enemy) # Follow by normal attack to enemy
             self.cooldown(enemy) # Lastly, cooldown the skill and include active skill activation
-        if self.HP <= 0:
-            if self.name == "Mechanic":
-                self.name = "Turret"
-                self.trait = "Building"
-                self.maxHP = 10*self.turn
-                self.ATK = self.turn
-                self.DEF = self.turn
-                self.restore_hp()
 
     def view_info(self):
         return f"Passive skill {self.dictionary['Passive skill name']}: {self.dictionary['Passive skill description']}\nActive skill {self.dictionary['Active skill name']}: {self.dictionary['Active skill description']}\nCooldown : {self.Cooldown}"
