@@ -60,9 +60,6 @@ class PVEGame:
     def battle_turn(self, player_id):
         player_data = self.players[player_id]
         turn = 1
-        if player_data['player'].add_coin:
-            player_data['coins'] += 1  # A player gain coin
-        player_data['player'].add_coin = False
         if not player_data['player']:
             return "Please *choose <character_name> first to put a character into battle."
         if player_data['player'].isdead():
@@ -72,6 +69,9 @@ class PVEGame:
             enemy = player_data['enemies'][0]
             # Player's turn
             player_data['player'].take_turn(enemy)
+            if player_data['player'].add_coin:
+                player_data['coins'] += player_data['player'].coin_bonus  # A player gain coin
+                player_data['player'].add_coin = False
             logging.info(f"After player attacks in turn {turn}")
             logging.info(f"Player: {player_data['player'].name}, HP: {player_data['player'].HP}, ATK: {player_data['player'].ATK}, DEF: {player_data['player'].DEF}")
             logging.info(f"Enemy: {enemy.name}, HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}")

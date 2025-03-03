@@ -278,6 +278,7 @@ class Swordman(Character):
         self.add_coin = False
         self.active_working = True
         self.level = 1
+        self.coin_bonus = 1
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""

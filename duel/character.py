@@ -10,6 +10,7 @@ class Character:
         self.Cost = Cost
         self.dead = False
         self.level = 1
+        self.coin_bonus = 0
 
     def restore_hp(self):
         """Restore the character's HP to full after ascending the floor."""

@@ -27,6 +27,7 @@ class Network_engineer(Character):
         self.dead = False
         self.add_coin = False
         self.level = 1
+        self.coin_bonus = self.level
 
     def receive_damage(self, damage_input, enemy):
         """Take damage from enemy"""
@@ -51,6 +52,7 @@ class Network_engineer(Character):
 
     def passive(self, enemy):
         """Passive skill : Microwave"""
+        self.coin_bonus = self.level
         if enemy.DEF > 0:
             enemy.DEF -= 1
 
