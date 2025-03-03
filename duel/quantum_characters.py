@@ -7,6 +7,7 @@ import random
 class Gatekeeper(Character):
     """Contain gatekeeper information (dynamic and static info) and gatekeeper methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Gatekeeper")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -85,6 +86,7 @@ class Gatekeeper(Character):
 class Toykeeper(Character):
     """Contain toykeeper information (dynamic and static info) and toykeeper methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Toykeeper")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])

@@ -7,6 +7,7 @@ import random
 class Network_engineer(Character):
     """Contain network engineer information (dynamic and static info) and network engineer methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Network engineer")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -87,6 +88,7 @@ class Network_engineer(Character):
 class Skateboarder(Character):
     """Contain skateboarder information (dynamic and static info) and skateboarder methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Skateboarder")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -169,6 +171,7 @@ class Skateboarder(Character):
 class Nurse(Character):
     """Contain nurse information (dynamic and static info) and nurse methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Nurse")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -258,6 +261,7 @@ class Nurse(Character):
 class Mechanic(Character):
     """Contain mechanic information (dynamic and static info) and mechanic methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Mechanic")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])

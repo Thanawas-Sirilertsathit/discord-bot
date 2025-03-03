@@ -7,6 +7,7 @@ import random
 class Star_collector(Character):
     """Contain star collector information (dynamic and static info) and star collector methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Star collector")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -88,6 +89,7 @@ class Star_collector(Character):
 class Phantom(Character):
     """Contain phantom information (dynamic and static info) and phantom methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Phantom")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -182,6 +184,7 @@ class Phantom(Character):
 class Astrologist(Character):
     """Contain astrologist information (dynamic and static info) and astrologist methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Astrologist")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -264,6 +267,7 @@ class Astrologist(Character):
 class Clockworker(Character):
     """Contain clockworker information (dynamic and static info) and clockworker methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Clockworker")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])

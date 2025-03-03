@@ -6,6 +6,7 @@ from duel.dict_finder import dict_finder
 class Sakura(Character):
     """Contain sakura information (dynamic and static info) and sakura methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Sakura")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -86,6 +87,7 @@ class Sakura(Character):
 class Paladin(Character):
     """Contain paladin information (dynamic and static info) and paladin methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Paladin")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])
@@ -167,6 +169,7 @@ class Paladin(Character):
 class Sister(Character):
     """Contain sister information (dynamic and static info) and sister methods"""
     def __init__(self):
+        super().__init__()
         self.dictionary = dict_finder("Sister")
         self.maxHP = int(self.dictionary["HP"])
         self.HP = int(self.dictionary["HP"])

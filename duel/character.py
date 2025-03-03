@@ -1,7 +1,7 @@
 class Character:
     """Abstract base class for all character types in the game."""
     
-    def __init__(self, name, maxHP, ATK, DEF, Cost):
+    def __init__(self, name="None", maxHP=1, ATK=1, DEF=1, Cost=1):
         self.name = name
         self.HP = maxHP
         self.maxHP = maxHP
