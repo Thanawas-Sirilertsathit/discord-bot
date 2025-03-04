@@ -812,7 +812,7 @@ async def enemies(ctx):
     if not enemies:
         await ctx.send("There are no enemies currently.")
         return
-    enemy_list = "\n".join([f"{enemy.name} (HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}, Cost: {enemy.Cost}, Element: {enemy.element}, Trait: {enemy.trait})" for enemy in enemies])
+    enemy_list = "\n".join([f"{enemy.name} (HP: {enemy.HP}, ATK: {enemy.ATK}, DEF: {enemy.DEF}, Cost: {enemy.Cost}, Element: {enemy.element}, Trait: {enemy.trait}, Level: {enemy.level})" for enemy in enemies])
     await ctx.send(f"**Upcoming enemies:**\n{enemy_list}")
 
 

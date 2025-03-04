@@ -81,7 +81,7 @@ class PVEGame:
                 if not player_data['enemies']:
                     player_data['floor'] += 1
                     self.update_leaderboard(player_id, player_data['floor'])
-                    player_data['coins'] = 15
+                    player_data['coins'] += 15
                     self.restore_allies_hp(player_id)
                     self.restore_enemies_hp(player_id)
                     self.generate_enemy_lineup(player_id)

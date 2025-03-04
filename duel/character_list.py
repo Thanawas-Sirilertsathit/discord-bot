@@ -131,6 +131,9 @@ class CharacterList:
         """Generate a list of enemies based on the floor level"""
         enemies = random.sample(self.chars_list, 3)
         for enemy in enemies:
+            enemy.maxHP += floor * 3
             enemy.HP += floor * 3
             enemy.ATK += floor
+            for i in range(floor//5):
+                enemy.level_up()
         return enemies
