@@ -134,6 +134,6 @@ class CharacterList:
             enemy.maxHP += floor * 3
             enemy.HP += floor * 3
             enemy.ATK += floor
-            for i in range(floor//5):
+            for i in range(floor//10):
                 enemy.level_up()
         return enemies
