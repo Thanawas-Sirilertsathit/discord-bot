@@ -740,7 +740,12 @@ async def start(ctx):
 @bot.command()
 async def top_floor(ctx):
     """Show the leaderboard with the highest floors reached."""
-    leaderboard_text = pve_game.view_leaderboard()
+    username_map = {}
+    for player_id in pve_game.leaderboard.keys():
+        user = await bot.fetch_user(int(player_id))
+        username_map[player_id] = user.name if user else "Unknown Player"
+
+    leaderboard_text = pve_game.view_leaderboard(username_map)
     await ctx.send(leaderboard_text)
 
 @bot.command()

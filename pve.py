@@ -178,11 +178,11 @@ class PVEGame:
 
         return f"You selected {new_char.name}!"
 
-    def view_leaderboard(self):
+    def view_leaderboard(self, username_map=None):
         """Return a sorted leaderboard string."""
         if not self.leaderboard:
             return "No leaderboard data available."
         
         sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
-        leaderboard_text = "\n".join([f"<@{player_id}>: Floor {floor}" for player_id, floor in sorted_leaderboard[:10]])
+        leaderboard_text = "\n".join([f"{username_map.get(player_id, 'Unknown Player')}: Floor {floor}"for player_id, floor in sorted_leaderboard[:10]])
         return f"🏆 **Leaderboard - Highest Floors** 🏆\n{leaderboard_text}"
