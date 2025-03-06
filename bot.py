@@ -892,7 +892,7 @@ async def rule(ctx):
     rule1 = "## The game is endless and ranking by using highest floor you can reach \n"
     rule2 = "- To start the game please use `*start`\n"
     rule3 = "- You will face 3 enemies in each floor which you can view their stats using `*enemies`\n"
-    rule4 = "- You gain 15 coins every floor you enter and you can view using `*coins`\n"
+    rule4 = "- You gain 15 coins and restore allies HP every floor you enter and you can your coins view using `*coins`\n"
     rule5 = "- The character has passive ability and active ability (has cooldown) `*info <character>`\n"
     rule6 = "- You have to buy character from the shop. After you buy, it disappears. `*buy <character>`\n"
     rule7 = "- You can view your inventory using `*inventory`\n"
