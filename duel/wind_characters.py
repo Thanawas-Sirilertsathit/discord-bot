@@ -213,12 +213,12 @@ class Sister(Character):
         self.tempATK = 0
 
     def passive(self, enemy):
-        """Passive skill : Regeneration (Heal 2 HP every turn)"""
+        """Passive skill : Regeneration (Heal 2 x level HP every turn)"""
         if self.HP < self.maxHP:
-            if self.maxHP - self.HP < 2:
+            if (self.maxHP - self.HP) < (self.level *2):
                 self.HP = self.maxHP
             else:
-                self.HP += 2
+                self.HP += (2 * self.level)
 
     def die(self, enemy):
         """Method for this character when it dies"""
