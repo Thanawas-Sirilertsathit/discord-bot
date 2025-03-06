@@ -31,7 +31,7 @@ DATA_FILE = "econ_data.json"
 @bot.group(invoke_without_command=True)
 async def game(ctx):
     """Prefix for game commands."""
-    await ctx.send("Available games : Bomb game, 11-9 game, Poker and Slot.")
+    await ctx.send("Available games : bombgame, plane, poker and slot.")
 
 @bot.group(invoke_without_command=True)
 async def econ(ctx):
