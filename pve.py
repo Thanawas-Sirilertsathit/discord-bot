@@ -150,6 +150,7 @@ class PVEGame:
         if owned_char:
             owned_char.level_up()
             player_data['coins'] -= char.Cost
+            player_data['shop'].remove(char)
             return f"{owned_char.name} leveled up to Level {owned_char.level}! Remaining coins: {player_data['coins']}"
         player_data['inventory'].append(char)
         player_data['coins'] -= char.Cost
