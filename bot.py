@@ -885,7 +885,24 @@ async def info(ctx, *character_name: str):
     else:
         await ctx.send("Character not found. Please check the name and try again.")
     char_list.reset()
-    
+
+@bot.command()
+async def rule(ctx):
+    """View the rule of the tower climbing game."""
+    rule1 = "## The game is endless and ranking by using highest floor you can reach \n"
+    rule2 = "- To start the game please use `*start`\n"
+    rule3 = "- You will face 3 enemies in each floor which you can view their stats using `*enemies`\n"
+    rule4 = "- You gain 15 coins every floor you enter and you can view using `*coins`\n"
+    rule5 = "- The character has passive ability and active ability (has cooldown) `*info <character>`\n"
+    rule6 = "- You have to buy character from the shop. After you buy, it disappears. `*buy <character>`\n"
+    rule7 = "- You can view your inventory using `*inventory`\n"
+    rule8 = "- You have to choose one character from your inventory to battle against the first enemy (You can use this command to swap character back to inventory). `*choose <character>`\n"
+    rule9 = "- Dead characters will disappear from your inventory and game will end when you don't have any character in the inventory.\n"
+    rule10 = "- Reroll the shop using 1 coin. `*reroll`\n"
+    rule11 = "- Buying character that you have in the inventory will upgrade that character!\n"
+    rule12 = "- The higher floor means the stronger enemy. Prepare yourself!"
+    text = rule1+rule2+rule3+rule4+rule5+rule6+rule7+rule8+rule9+rule10+rule11+rule12
+    await ctx.send(text)
 
 @bot.event
 async def on_ready():
