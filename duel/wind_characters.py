@@ -260,7 +260,6 @@ class Windmill(Character):
         self.HP = int(self.dictionary["HP"])
         self.ATK = int(self.dictionary["ATK"])
         self.name = self.dictionary["Name"]
-        self.name = self.dictionary["Name"]
         self.DEF = int(self.dictionary["DEF"])
         self.Cooldown = int(self.dictionary["Skill cooldown"])
         self.currentcooldown = 0
@@ -300,7 +299,7 @@ class Windmill(Character):
     def passive(self, enemy):
         """Passive skill : Strong blades"""
         self.coin_bonus = self.level
-        self.ATK += 1
+        self.DEF += 1
 
     def die(self, enemy):
         """Method for this character when it dies"""

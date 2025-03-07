@@ -13,7 +13,6 @@ class Network_engineer(Character):
         self.HP = int(self.dictionary["HP"])
         self.ATK = int(self.dictionary["ATK"])
         self.name = self.dictionary["Name"]
-        self.name = self.dictionary["Name"]
         self.DEF = int(self.dictionary["DEF"])
         self.Cooldown = int(self.dictionary["Skill cooldown"])
         self.currentcooldown = 0
