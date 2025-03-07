@@ -73,7 +73,7 @@ class Network_engineer(Character):
             self.currentcooldown = 0
     
     def active_skill(self, enemy):
-        """Active skill for network engineer : gain 1 coin"""
+        """Active skill for network engineer : gain 1 coin for each level she has"""
         self.add_coin = True # The game will consider this as adding one more coin for a player
 
     def take_turn(self, enemy):

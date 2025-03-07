@@ -5,7 +5,7 @@ from duel.fire_characters import Archer, Speedster, Cannon_cart, Socerer
 from duel.ice_characters import Actress, Glacier, Ice_worker
 from duel.plant_characters import Entomologist, Florist, Huntress, Greenhouse
 from duel.water_characters import Arcmage, Barista, Painter, Lawyer
-from duel.wind_characters import Sakura, Sister, Paladin
+from duel.wind_characters import Sakura, Sister, Paladin, Windmill
 from duel.quantum_characters import Gatekeeper, Toykeeper
 import random
 
@@ -45,6 +45,7 @@ class CharacterList:
         self.clockworker = Clockworker()
         self.socerer = Socerer()
         self.greenhouse = Greenhouse()
+        self.windmill = Windmill()
         self.chars_list = []
 
     def reset(self):
@@ -81,6 +82,7 @@ class CharacterList:
         self.clockworker = Clockworker()
         self.socerer = Socerer()
         self.greenhouse = Greenhouse()
+        self.windmill = Windmill()
         self.chars_list = []
 
     def generate_list(self):
@@ -118,6 +120,7 @@ class CharacterList:
         self.chars_list.append(self.clockworker)
         self.chars_list.append(self.socerer)
         self.chars_list.append(self.greenhouse)
+        self.chars_list.append(self.windmill)
 
     def get_list(self):
         """Return a list contains all characters"""
