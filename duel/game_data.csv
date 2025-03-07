@@ -20,6 +20,7 @@ Sister,5,15,1,3,Siege,Wind,Regeneration,Heal 2 x level HP every turn,Blessing,2,
 Florist,4,10,2,4,None,Plant,Petal drop,Deal additional 3 damage to Water character when attack,Full decorated vase,3,Deal 6 damage to enemy
 Entomologist,4,12,1,3,None,Plant,Herbivore,Gain 3 x ATK when current enemy is Plant,Scorpion poison,5,Enemy HP turn to 1
 Huntress,3,10,1,2,None,Plant,Poison,Attack ignore enemy DEF,Poison arrow,3,Deal additional 5 damage to Electro character when attack
+Greenhouse,8,40,5,3,Building,Plant,Herb of knowledge,Give three levels to next selected character,Automatic watering system,2,Add 5 max HP
 Clocktower,6,60,6,1,Building,Earth,Time flies,Each turn ATK and DEF increase by 1 until this character reach 12 ATK and 12 DEF,Secret anti air,2,Deal 30 damage to Wind character
 Estelle forge,6,20,5,7,Building,Earth,Swordsmith,Each turn ATK increase by 1,Iron forge,3,Gain +5 DEF permanently
 Swordman,2,10,2,5,None,Earth,Sharp sword,Deal additional 3 damage to Earth character when attack,Golden sword,2,Gain 1 coin after kill an enemy (This effect last long for 1 turn)

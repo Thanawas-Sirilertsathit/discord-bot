@@ -12,7 +12,7 @@ class PVEGame:
         self.players = {}  # Store individual player stats
         self.leaderboard_file = "leaderboard.json"
         self.leaderboard = self.load_leaderboard()
-        self.dead_buff = {"Clockworker": [10, 5, 0, 0], "Socerer": [0, 0, 0, 1]}
+        self.dead_buff = {"Clockworker": [10, 5, 0, 0], "Socerer": [0, 0, 0, 1], "Greenhouse":[0, 0, 0, 3]}
         logging.basicConfig(level=logging.INFO, filename="battle_log.log", filemode="w")
 
     def load_leaderboard(self):
@@ -102,8 +102,8 @@ class PVEGame:
                 return "Your character has been defeated. Choose a new character from your inventory using *choose <character_name>."
             turn += 1
         # Turn limit reached - force both player and enemy to die
-        player_data['player'].die()
-        player_data['enemies'][0].die()
+        player_data['player'].die(player_data['enemies'][0])
+        player_data['enemies'][0].die(player_data['player'])
         player_data['enemies'].pop(0)
         # Check if the player has more characters in inventory
         if player_data['inventory']:
