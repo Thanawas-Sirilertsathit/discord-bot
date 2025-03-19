@@ -15,6 +15,7 @@ from towerdodge import *
 from gomoku import *
 from pve import *
 from duel.character_list import CharacterList
+from etr_price import get_ethereum_price
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -27,6 +28,18 @@ BOT_TOKEN = config('BOT_TOKEN')
 
 # JSON file to store user data
 DATA_FILE = "econ_data.json"
+
+current_etr_price = 0
+async def update_gold_price():
+    global current_etr_price
+    while True:
+        new_price = get_ethereum_price()
+        if new_price is not None:
+            current_etr_price = new_price
+            print(f"Gold price updated: {current_etr_price} $")
+        else:
+            print("⚠️ Failed to fetch gold price.")
+        await asyncio.sleep(600)
 
 @bot.group(invoke_without_command=True)
 async def game(ctx):
@@ -590,6 +603,67 @@ async def view_farm(ctx):
     farm_status = "\n".join(field_status)
     await ctx.send(f"{ctx.author.mention}, here is the status of your farm:\n{farm_status}")
 
+@econ.command()
+async def buy_gold(ctx, amount = 1):
+    """Buy gold for your future (Kanade Gold market)."""
+    player_id = ctx.author.id
+    data = load_player_data()
+    player_data = get_or_create_chips(player_id)
+    current_chips = player_data['chips']
+    if current_etr_price is None:
+        await ctx.send(f"⚠️ The gold price is currently unavailable.")
+        return
+    gold_per_chip = 1 / current_etr_price
+    max_gold = current_chips * gold_per_chip
+    if amount > max_gold:
+        await ctx.send(f"{ctx.author.mention}, you can only buy up to {max_gold:.2f} gold with your current chips.")
+        return
+    cost = amount * current_etr_price
+    if current_chips < cost:
+        await ctx.send(f"{ctx.author.mention}, you don't have enough chips to buy {amount} gold.")
+        return
+    if 'gold' not in player_data:
+        data[str(player_id)]["gold"] = 0
+    data[str(player_id)]["gold"] = amount
+    new_chips = current_chips - cost
+    data[str(player_id)]["chips"] = new_chips
+    save_player_data(data)
+    await ctx.send(f"{ctx.author.mention}, you've successfully bought {amount:.2f} gold for {cost:.2f} chips. Your new balance is {new_chips:.2f} 🪙.")
+
+@econ.command()
+async def sell_gold(ctx, amount = 1):
+    """Sell gold for chips."""
+    player_id = ctx.author.id
+    data = load_player_data()
+    player_data = get_or_create_chips(player_id)
+    current_chips = player_data['chips']
+    try:
+        current_gold = player_data['gold']
+    except Exception as e:
+        await ctx.send(f"⚠️ You don't have any gold to sell.")
+        return
+    if current_gold is None:
+        await ctx.send(f"⚠️ You don't have any gold to sell.")
+        return
+    if amount > current_gold:
+        await ctx.send(f"{ctx.author.mention}, you don't have enough gold to sell {amount} units.")
+        return
+    gold_price = current_etr_price
+    chips_received = amount * gold_price
+    new_chips = current_chips + chips_received
+    data[str(player_id)]["chips"] = new_chips
+    data[str(player_id)]["gold"] -= amount
+    save_player_data(data)
+    await ctx.send(f"{ctx.author.mention}, you've successfully sold {amount:.2f} gold for {chips_received:.2f} chips. Your new balance is {new_chips:.2f} 🪙.")
+
+@econ.command()
+async def gold(ctx):
+    """Show the current price of gold."""
+    if current_etr_price is None:
+        await ctx.send(f"⚠️ The gold price is currently unavailable.")
+    else:
+        await ctx.send(f"💰 The current price of gold is {current_etr_price} 🪙 per unit.")
+
 @bot.command()
 async def leaderboard(ctx):
     """View the leaderboard for the top 10 users with the most chips in the server."""
@@ -909,6 +983,7 @@ async def on_ready():
     activity = discord.Game(name="Piano 🎹")
     await bot.change_presence(activity=activity)
     print(f'Logged in as {bot.user} and status set to Playing Piano 🎹.')
+    bot.loop.create_task(update_gold_price())
 
 @bot.event
 async def on_command_error(ctx, error):
