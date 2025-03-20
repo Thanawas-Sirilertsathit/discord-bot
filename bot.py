@@ -49,7 +49,7 @@ async def game(ctx):
 @bot.group(invoke_without_command=True)
 async def econ(ctx):
     """Prefix for economic related commands."""
-    await ctx.send("Available commands : daily, farm, harvest, view_farm and balance.")
+    await ctx.send("Available commands : daily, farm, harvest, view_farm, buy_gold, sell_gold, gold and balance.")
 
 @game.command()
 @commands.cooldown(1, 120, BucketType.user)
