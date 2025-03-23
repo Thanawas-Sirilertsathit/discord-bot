@@ -637,6 +637,17 @@ async def sell_gold(ctx, amount = 1):
     data = load_player_data()
     player_data = get_or_create_chips(player_id)
     current_chips = player_data['chips']
+    if current_gold <= 0:
+        await ctx.send("⚠️ You don't have any gold to sell.")
+        return
+    if isinstance(amount, str) and amount.lower() == "all":
+        amount = current_gold
+    else:
+        try:
+            amount = float(amount)
+        except ValueError:
+            await ctx.send("⚠️ Invalid amount. Please enter a number or 'all'.")
+            return
     try:
         current_gold = player_data['gold']
     except Exception as e:
