@@ -49,7 +49,7 @@ async def game(ctx):
 @bot.group(invoke_without_command=True)
 async def econ(ctx):
     """Prefix for economic related commands."""
-    await ctx.send("Available commands : daily, farm, harvest, view_farm, buy_gold, sell_gold, gold and balance.")
+    await ctx.send("Available commands : daily, farm, harvest, view_farm, buy_gold, sell_gold, price_gold, gold and balance.")
 
 @game.command()
 @commands.cooldown(1, 120, BucketType.user)
@@ -624,7 +624,7 @@ async def buy_gold(ctx, amount = 1):
         return
     if 'gold' not in player_data:
         data[str(player_id)]["gold"] = 0
-    data[str(player_id)]["gold"] = amount
+    data[str(player_id)]["gold"] += amount
     new_chips = current_chips - cost
     data[str(player_id)]["chips"] = new_chips
     save_player_data(data)
@@ -658,6 +658,14 @@ async def sell_gold(ctx, amount = 1):
 
 @econ.command()
 async def gold(ctx):
+    """Check the amount of gold you have."""
+    player_id = ctx.author.id
+    player_data = get_or_create_chips(player_id)
+    gold = player_data.get('gold', 0)
+    await ctx.send(f"{ctx.author.mention}, you have {gold:.2f} gold. ✨")
+
+@econ.command()
+async def price_gold(ctx):
     """Show the current price of gold."""
     if current_etr_price is None:
         await ctx.send(f"⚠️ The gold price is currently unavailable.")
