@@ -4,7 +4,6 @@ import logging
 import copy
 import json
 import os
-from duel.quantum_characters import Toykeeper
 
 class PVEGame:
     def __init__(self):
