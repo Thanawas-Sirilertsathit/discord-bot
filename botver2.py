@@ -80,13 +80,21 @@ async def reserve(interaction: discord.Interaction, year: int, month: int, day: 
             "user": interaction.user.id,
             "start": start_time.strftime("%Y-%m-%d %H:%M"),
             "end": end_time.strftime("%Y-%m-%d %H:%M"),
-            "gamemode": gamemode  # <-- store gamemode
+            "gamemode": gamemode
         })
         save_reservations(reservations)
 
-        await interaction.response.send_message(
-            f"✅ Reserved for a Blue Archive raid session {start_time.strftime('%Y-%m-%d %H:%M')} - {end_time.strftime('%H:%M')} (Gamemode: {gamemode})"
+        embed = discord.Embed(
+            title="✅ Reservation Confirmed",
+            color=discord.Color.green(),
+            timestamp=start_time
         )
+        embed.add_field(name="Time", value=f"{start_time.strftime('%Y-%m-%d %H:%M')} - {end_time.strftime('%H:%M')}", inline=False)
+        embed.add_field(name="Reserved by", value=interaction.user.display_name, inline=False)
+        embed.add_field(name="Gamemode", value=gamemode, inline=False)
+        embed.set_footer(text="Blue Archive Raid Session")
+
+        await interaction.response.send_message(embed=embed)
 
     except ValueError:
         await interaction.response.send_message(
