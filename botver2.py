@@ -12,6 +12,7 @@ bot = commands.Bot(command_prefix="*", intents=intents)
 BOT_TOKEN = config("BOT_TOKEN")
 
 DATA_FILE = "reservation.json"
+STAT_FILE = "stat.json"
 GUILD_ID = int(config("GUILD_ID_TEST"))
 CHANNEL_ID = int(config("CHANNEL_ID_TEST"))
 SHOPOWNER_ID = int(config("SHOPOWNER_ID"))
