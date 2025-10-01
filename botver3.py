@@ -13,8 +13,8 @@ BOT_TOKEN = config("BOT_TOKEN")
 
 DATA_FILE = "reservation.json"
 STAT_FILE = "stat.json"
-GUILD_ID = int(config("GUILD_ID_TEST"))
-CHANNEL_ID = int(config("CHANNEL_ID_TEST"))
+GUILD_ID = int(config("GUILD_ID"))
+CHANNEL_ID = int(config("CHANNEL_ID"))
 SHOPOWNER_ID = int(config("SHOPOWNER_ID"))
 
 # Operating hours
@@ -164,7 +164,7 @@ async def confirm(interaction: discord.Interaction, user: discord.User):
             save_reservations(reservations)
 
             embed = discord.Embed(
-                title="🔒 Reservation Confirmed by Shopowner",
+                title="🔒 Reservation Confirmed by Head Sensei",
                 color=discord.Color.gold()
             )
             embed.add_field(name="User", value=user.mention, inline=False)
