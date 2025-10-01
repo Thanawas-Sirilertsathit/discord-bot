@@ -145,7 +145,7 @@ async def reserve(interaction: discord.Interaction, year: int, month: int, day: 
 
 @bot.tree.command(
     name="confirm",
-    description="Confirm a user's reservation (Shopowner only)."
+    description="Confirm a user's reservation give confirmation EXP (Head Sensei only)."
 )
 @app_commands.describe(user="The user to confirm reservation for")
 @app_commands.guilds(discord.Object(id=GUILD_ID))
@@ -155,28 +155,38 @@ async def confirm(interaction: discord.Interaction, user: discord.User):
         return
 
     reservations = load_reservations()
-    found = False
+    stats = add_exp(user.id, 3, confirmed=True)  # Always add 3 EXP + 1 confirmation
+
+    # Ensure user has at least 0 reservations stat
+    add_reservation_stat(user.id)
+
+    # Try to find an unconfirmed reservation
+    unconfirmed_reservation = None
     for r in reservations:
         if r["user"] == user.id and not r.get("confirmed", False):
             r["confirmed"] = True
-            found = True
-            stats = add_exp(user.id, 3, confirmed=True)  # add 3 exp + confirmation
-            save_reservations(reservations)
-
-            embed = discord.Embed(
-                title="🔒 Reservation Confirmed by Head Sensei",
-                color=discord.Color.gold()
-            )
-            embed.add_field(name="User", value=user.mention, inline=False)
-            embed.add_field(name="Gamemode", value=r.get("gamemode", "N/A"), inline=False)
-            embed.add_field(name="EXP", value=f"{stats['exp']} (Level {stats['level']})", inline=False)
-            embed.set_footer(text="Blue Archive Raid Session")
-            await interaction.response.send_message(embed=embed)
+            unconfirmed_reservation = r
             break
 
-    if not found:
-        await interaction.response.send_message("❌ No unconfirmed reservations found for that user.", ephemeral=True)
+    # Save reservations if updated
+    save_reservations(reservations)
 
+    embed = discord.Embed(
+        title="🔒 Reservation Confirmed by Head Sensei",
+        color=discord.Color.gold()
+    )
+    embed.add_field(name="User", value=user.mention, inline=False)
+    if unconfirmed_reservation:
+        embed.add_field(name="Gamemode", value=unconfirmed_reservation.get("gamemode", "N/A"), inline=False)
+        embed.add_field(name="Time", value=f"{unconfirmed_reservation['start']} - {unconfirmed_reservation['end']}", inline=False)
+    else:
+        embed.add_field(name="Gamemode", value="N/A", inline=False)
+        embed.add_field(name="Time", value="N/A", inline=False)
+        embed.set_footer(text="Manually granted confirmation and EXP")
+
+    embed.add_field(name="EXP", value=f"{stats['exp']} (Level {stats['level']})", inline=False)
+
+    await interaction.response.send_message(embed=embed)
 
 @bot.tree.command(
     name="schedule",
